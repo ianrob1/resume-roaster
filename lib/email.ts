@@ -54,7 +54,12 @@ export async function sendResumeRoastEmail({
   /** First name from the resume (e.g. first line); overrides email-derived name for subject */
   candidateFirstName?: string | null;
 }) {
-  const from = process.env.EMAIL_FROM ?? "Resume Roaster <onboarding@resend.dev>";
+  const verifiedFrom = "Resume Roaster <results@resroa.com>";
+  const rawFrom = process.env.EMAIL_FROM ?? verifiedFrom;
+  const from = rawFrom
+    .replace(/\bResume Roast\b/g, "Resume Roaster")
+    .replace(/<onboarding@resend\.dev>/i, "<results@resroa.com>");
+  const fromAddress = from.includes("results@resroa.com") ? from : verifiedFrom;
   const resend = getResend();
   const firstName = candidateFirstName ?? getFirstNameFromEmail(to);
   const subject = firstName
@@ -123,7 +128,7 @@ export async function sendResumeRoastEmail({
   `;
 
   const { data, error } = await resend.emails.send({
-    from,
+    from: fromAddress,
     to: [to],
     subject,
     html,
