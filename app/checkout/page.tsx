@@ -11,7 +11,7 @@ function CheckoutContent() {
 
   useEffect(() => {
     if (!recordId) {
-      setError("Missing record. Please start from the upload page.");
+      setError("Missing record. Please start from the home page.");
       return;
     }
     let cancelled = false;
@@ -48,8 +48,8 @@ function CheckoutContent() {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
         <p className="text-center text-foreground">{error}</p>
-        <Link href="/upload" className="mt-4 text-[var(--accent)] hover:underline">
-          Back to upload
+        <Link href="/" className="mt-4 text-[var(--accent)] hover:underline">
+          Back to home
         </Link>
       </main>
     );

@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       ],
       mode: "payment",
       success_url: `${baseUrl}/processing?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/upload`,
+      cancel_url: `${baseUrl}/`,
       metadata: { recordId },
     });
 

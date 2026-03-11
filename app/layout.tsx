@@ -5,12 +5,14 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Resume Roast — Get your resume roasted in 60 seconds",
+  title: "Resume Roaster — Get your resume roasted in 60 seconds",
   description:
-    "Upload your resume and receive brutal but useful feedback, an ATS score, and a rewritten version.",
+    "Resume Roaster — Upload your resume and receive brutal but useful feedback, an ATS score, and a rewritten version.",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
+    icon: [
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.png", sizes: "16x16", type: "image/png" },
+    ],
     apple: "/favicon.png",
   },
 };

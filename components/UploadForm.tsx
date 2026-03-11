@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
 
 const JOB_ROLES = [
@@ -16,7 +15,6 @@ const JOB_ROLES = [
 const EXPERIENCE_LEVELS = ["Entry", "Mid", "Senior"] as const;
 
 export function UploadForm() {
-  const router = useRouter();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [jobRole, setJobRole] = useState<string>("");
@@ -24,6 +22,7 @@ export function UploadForm() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const canSubmit =
     fileUrl && jobRole && experienceLevel && email && !loading;
@@ -55,13 +54,26 @@ export function UploadForm() {
       if (!res.ok) {
         throw new Error(data.error ?? "Upload failed");
       }
-      const recordId = data.recordId ?? "";
-      if (!recordId) throw new Error("No record ID returned");
-      router.push(`/checkout?record_id=${encodeURIComponent(recordId)}`);
+      setLoading(false);
+      setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
     }
+  }
+
+  if (submitted) {
+    return (
+      <div className="rounded-xl border border-foreground/10 bg-foreground/[0.02] px-6 py-8 text-center">
+        <p className="text-lg font-semibold text-foreground">Resume received</p>
+        {fileName && (
+          <p className="mt-1 text-sm text-foreground/80" title={fileName}>
+            {fileName}
+          </p>
+        )}
+        <p className="mt-2 text-sm text-foreground/70">We&apos;ll be in touch at {email}.</p>
+      </div>
+    );
   }
 
   return (
@@ -71,17 +83,32 @@ export function UploadForm() {
           Resume
         </label>
         {!fileUrl ? (
-          <div className="[&_.uploadthing]:!rounded-xl">
-            <UploadDropzone
-              endpoint="resumeUploader"
-              onClientUploadComplete={(res) => {
-                if (res?.[0]?.url) {
-                  setFileUrl(res[0].url);
-                  setFileName(res[0].name ?? null);
-                }
-              }}
-              onUploadError={(err) => setError(err.message)}
-            />
+          <div className="space-y-2">
+            <div className="[&_.uploadthing]:!rounded-xl">
+              <UploadDropzone
+                endpoint="resumeUploader"
+                content={{
+                  label: ({ isUploading }) =>
+                    isUploading ? (
+                      <span className="flex items-center gap-2 text-sm text-foreground/70">
+                        <span className="size-4 shrink-0 animate-spin rounded-full border-2 border-foreground/25 border-t-[var(--accent)]" aria-hidden />
+                        Uploading…
+                      </span>
+                    ) : (
+                      "Drag or click to upload your resume"
+                    ),
+                }}
+                onClientUploadComplete={(res) => {
+                  setError(null);
+                  if (res?.[0]?.url) {
+                    setFileUrl(res[0].url);
+                    setFileName(res[0].name ?? null);
+                  }
+                }}
+                onUploadError={(err) => setError(err?.message ?? "Upload failed. Check that UPLOADTHING_TOKEN is set in .env.local (v7 token from UploadThing Dashboard) and restart the dev server.")}
+              />
+            </div>
+            <p className="text-xs text-foreground/50">PDF or Word (.doc, .docx), max 4MB</p>
           </div>
         ) : (
           <div className="flex items-center justify-between rounded-xl border border-foreground/10 bg-foreground/[0.02] px-4 py-3">
@@ -169,7 +196,7 @@ export function UploadForm() {
         disabled={!canSubmit}
         className="w-full rounded-xl bg-[var(--accent)] py-3.5 text-base font-semibold text-white transition hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {loading ? "Uploading…" : "Continue to checkout — $19"}
+        {loading ? "Submitting…" : "Submit"}
       </button>
     </form>
   );

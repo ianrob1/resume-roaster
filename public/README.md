@@ -1,8 +1,4 @@
 # Static assets
 
-Put your **logo** here:
-
-- **`logo.png`** — recommended (or use `logo.svg`)
-- The logo appears in the top-left corner on every page (home, upload, results).
-
-Replace this file with your image named `logo.png` (or update `LOGO_PATH` in `components/Header.tsx` to `/logo.svg` if you use an SVG).
+- **`logo.png`** — Header logo (top-left on every page). Replace with your image.
+- **`favicon.png`** — Browser tab icon. Use a **small square image** (32×32 or 64×64 pixels) so it stays sharp. Large images get scaled down and look blurry.

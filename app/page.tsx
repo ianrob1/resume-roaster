@@ -1,22 +1,26 @@
 import { Header } from "@/components/Header";
+import { ExampleRoastsMarquee } from "@/components/ExampleRoastsMarquee";
 import { Hero } from "@/components/Hero";
+import { ATSInfoButton } from "@/components/ATSInfoButton";
 
 const iconClass = "size-10 text-[var(--accent)]";
 
-const features = [
-  {
-    title: "ATS Compatibility Score",
-    desc: "See how well your resume passes applicant tracking systems.",
-    icon: (
-      <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M9 3v1M15 3v1M8 4v1M16 4v1" />
-        <rect x="5" y="6" width="14" height="12" rx="2" />
-        <circle cx="9.5" cy="10.5" r="1.25" fill="currentColor" />
-        <circle cx="14.5" cy="10.5" r="1.25" fill="currentColor" />
-        <path d="M9 15h6" />
-      </svg>
-    ),
-  },
+const atsIconClass = "size-10 text-white";
+const atsFeature = {
+  title: "ATS Compatibility Score",
+  desc: "See how well your resume passes applicant tracking systems.",
+  icon: (
+    <svg className={atsIconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M9 3v1M15 3v1M8 4v1M16 4v1" />
+      <rect x="5" y="6" width="14" height="12" rx="2" />
+      <circle cx="9.5" cy="10.5" r="1.25" fill="currentColor" />
+      <circle cx="14.5" cy="10.5" r="1.25" fill="currentColor" />
+      <path d="M9 15h6" />
+    </svg>
+  ),
+};
+
+const otherFeatures = [
   {
     title: "Bullet Point Rewrites",
     desc: "Get before/after versions of weak bullets.",
@@ -38,6 +42,15 @@ const features = [
     ),
   },
   {
+    title: "Brutal Roast Feedback",
+    desc: "Honest, no-fluff feedback on what's holding your resume back.",
+    icon: (
+      <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  {
     title: "AI Resume Rewrite",
     desc: "A full improved version of your resume.",
     icon: (
@@ -50,46 +63,48 @@ const features = [
   },
 ];
 
+// Order: [Bullet, Keyword, ATS (center/highlight), Brutal Roast, AI Rewrite]
+const features = [
+  otherFeatures[0],
+  otherFeatures[1],
+  atsFeature,
+  otherFeatures[2],
+  otherFeatures[3],
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <Header />
       <Hero />
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="text-center text-2xl font-semibold text-foreground">
+      <section className="mx-auto max-w-7xl px-4 py-16">
+        <h2 className="font-marker text-center text-4xl font-semibold text-foreground sm:text-5xl">
           What you get
         </h2>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-lg border border-foreground/10 bg-white p-5 shadow-sm"
-            >
-              <div className="mb-3 flex items-center justify-center" aria-hidden>
-                {f.icon}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5 justify-items-center sm:justify-items-stretch">
+          {features.map((f) => {
+            const isATS = f.title === "ATS Compatibility Score";
+            return (
+              <div
+                key={f.title}
+                className={`relative rounded-xl border p-6 shadow-sm w-full max-w-sm sm:max-w-none ${
+                  isATS
+                    ? "border-[#d96d2b] bg-gradient-to-b from-[#e87b35] to-[#d96d2b] p-6 text-white shadow-[0_4px_0_0_rgba(0,0,0,0.08),0_8px_16px_-4px_rgba(233,123,53,0.45),0_16px_32px_-12px_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-2 ring-[#e87b35]/50 ring-offset-2 ring-offset-background"
+                    : "border-foreground/10 bg-white"
+                }`}
+              >
+                {isATS && <ATSInfoButton />}
+                <div className="mb-3 flex items-center justify-center" aria-hidden>
+                  {f.icon}
+                </div>
+                <h3 className={`font-semibold ${isATS ? "text-white" : "text-foreground"}`}>{f.title}</h3>
+                <p className={`mt-2 text-sm ${isATS ? "text-white/90" : "text-foreground/70"}`}>{f.desc}</p>
               </div>
-              <h3 className="font-semibold text-foreground">{f.title}</h3>
-              <p className="mt-2 text-sm text-foreground/70">{f.desc}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
-      <section className="mx-auto max-w-3xl px-4 py-16">
-        <h2 className="text-center text-2xl font-semibold text-foreground">
-          Example roast
-        </h2>
-        <div className="mt-8 rounded-xl border border-foreground/10 bg-white p-6 shadow-sm">
-          <p className="font-medium text-foreground">Roast:</p>
-          <p className="mt-2 text-foreground/90">
-            Your resume reads like a job description, not an achievement list.
-            &quot;Responsible for managing projects&quot; tells recruiters nothing.
-          </p>
-          <p className="mt-4 font-medium text-foreground">Instead try:</p>
-          <p className="mt-2 text-foreground/90">
-            &quot;Managed 12 projects worth $2.1M in client revenue.&quot;
-          </p>
-        </div>
-      </section>
+      <ExampleRoastsMarquee />
       <footer className="border-t border-foreground/10 py-8 text-center text-sm text-foreground/60">
         Resume Roaster — Get roasted, get hired.
       </footer>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 const STEPS = [
@@ -11,24 +11,22 @@ const STEPS = [
 ];
 
 const POLL_INTERVAL_MS = 2500;
-const TIMEOUT_MS = 2 * 60 * 1000;
+const TAKING_LONGER_AFTER_MS = 60_000; // After 60s, show "Taking a little longer" on same screen
+const TRIGGER_ANALYSIS_AFTER_MS = 12_000; // If still not completed after 12s, trigger analysis (e.g. webhook didn't run)
 
 function ProcessingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sessionId = searchParams.get("session_id");
   const [stepIndex, setStepIndex] = useState(0);
-  const [timedOut, setTimedOut] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [takingLonger, setTakingLonger] = useState(false);
+  const triggerAttemptedRef = useRef(false);
+  const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
     if (!sessionId) return;
-    const deadline = Date.now() + TIMEOUT_MS;
     const interval = setInterval(async () => {
-      if (Date.now() > deadline) {
-        setTimedOut(true);
-        return;
-      }
       try {
         const res = await fetch(`/api/results?session_id=${encodeURIComponent(sessionId)}`);
         const data = await res.json().catch(() => ({}));
@@ -38,6 +36,22 @@ function ProcessingContent() {
         }
         if (!res.ok && data.error) {
           setErrorMsg(data.error);
+          return;
+        }
+        // If still not completed after a while, trigger analysis (e.g. Stripe webhook didn't run locally)
+        const elapsed = Date.now() - startedAtRef.current;
+        if (
+          data.recordId &&
+          data.status !== "completed" &&
+          !triggerAttemptedRef.current &&
+          elapsed >= TRIGGER_ANALYSIS_AFTER_MS
+        ) {
+          triggerAttemptedRef.current = true;
+          fetch("/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recordId: data.recordId, session_id: sessionId }),
+          }).catch(() => {});
         }
       } catch {
         // keep polling
@@ -48,7 +62,7 @@ function ProcessingContent() {
 
   useEffect(() => {
     if (!sessionId) return;
-    const t = setTimeout(() => setTimedOut(true), TIMEOUT_MS);
+    const t = setTimeout(() => setTakingLonger(true), TAKING_LONGER_AFTER_MS);
     return () => clearTimeout(t);
   }, [sessionId]);
 
@@ -67,24 +81,12 @@ function ProcessingContent() {
     );
   }
 
-  if (timedOut || errorMsg) {
+  if (errorMsg) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
         <div className="max-w-md text-center space-y-4">
-          <p className="text-lg font-medium text-foreground">
-            {timedOut ? "This is taking longer than usual." : "Something went wrong."}
-          </p>
-          {errorMsg && <p className="text-sm text-foreground/80">{errorMsg}</p>}
-          <p className="text-sm text-foreground/60">
-            Check your email for the report, or try opening your results below.
-          </p>
-          <a
-            href={`/results?session_id=${encodeURIComponent(sessionId ?? "")}`}
-            className="inline-block rounded-lg bg-[var(--accent)] px-6 py-3 font-semibold text-white hover:bg-[var(--accent-hover)]"
-          >
-            View results
-          </a>
-          <br />
+          <p className="text-lg font-medium text-foreground">Something went wrong.</p>
+          <p className="text-sm text-foreground/80">{errorMsg}</p>
           <a href="/" className="text-sm text-[var(--accent)] hover:underline">
             Back to home
           </a>
@@ -101,7 +103,9 @@ function ProcessingContent() {
           {STEPS[stepIndex]}
         </p>
         <p className="mt-2 text-sm text-foreground/60">
-          This usually takes under 60 seconds.
+          {takingLonger
+            ? "Taking a little longer for this roast — we'll have it ready soon."
+            : "This usually takes under 60 seconds."}
         </p>
       </div>
     </main>

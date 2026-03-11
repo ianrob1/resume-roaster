@@ -8,16 +8,9 @@ export const runtime = "nodejs";
 
 const uploadSchema = z.object({
   resume_file: z.string().url(),
-  job_role: z.enum([
-    "Software Engineer",
-    "Product Manager",
-    "Marketing",
-    "Sales",
-    "Finance",
-    "Other",
-  ]),
   experience_level: z.enum(["Entry", "Mid", "Senior"]),
-  email: z.string().email(),
+  job_role: z.enum(["Software Engineer", "Product Manager", "Marketing", "Sales", "Finance", "Other"]).optional(),
+  email: z.string().email().optional(),
 });
 
 function getErrorMessage(err: unknown): string {
@@ -36,7 +29,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const { resume_file, job_role, experience_level, email } = parsed.data;
+    const { resume_file, experience_level, job_role, email } = parsed.data;
 
     let raw_text: string;
     try {
@@ -58,9 +51,9 @@ export async function POST(request: Request) {
     let record: { id: string };
     try {
       record = await createResumeRecord({
-        email,
+        email: email?.trim() ?? "",
         resume_file,
-        job_role: job_role as JobRole,
+        job_role: (job_role as JobRole) ?? "Other",
         experience_level: experience_level as ExperienceLevel,
         raw_text,
       });
