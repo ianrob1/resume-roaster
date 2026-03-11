@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   description: "Resume Roaster — Get roasted, get hired.",
   icons: {
     icon: [
-      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
     ],
-    apple: "/favicon.png",
+    apple: "/favicon-32.png",
   },
 };
 
