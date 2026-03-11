@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getResumeRecord } from "@/lib/airtable";
 import { runAnalysis } from "@/lib/analysis";
-import { sendResumeRoastEmail } from "@/lib/email";
+import { getFirstNameFromResumeText, sendResumeRoastEmail } from "@/lib/email";
 
 const analyzeSchema = z.object({
   recordId: z.string().min(1),
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         missingKeywords: result.missing_keywords,
         rewrittenResume: result.rewritten_resume,
         jobRole: record.job_role,
+        candidateFirstName: getFirstNameFromResumeText(record.raw_text),
       });
     }
   } catch (err) {

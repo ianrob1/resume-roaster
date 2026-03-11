@@ -15,6 +15,23 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/** Derive first name from email for personalization (e.g. ian.robinson@x.com → Ian). */
+function getFirstNameFromEmail(email: string): string | null {
+  const local = email.split("@")[0]?.trim() ?? "";
+  const segment = local.split(/[._-]/)[0] ?? "";
+  if (segment.length < 2) return null;
+  return segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase();
+}
+
+/** Extract first name from resume raw text (first line, first word). Used for email subject. */
+export function getFirstNameFromResumeText(rawText: string | undefined): string | null {
+  if (!rawText?.trim()) return null;
+  const firstLine = rawText.split(/\n/).find((l) => l.trim().length > 0)?.trim() ?? "";
+  const firstWord = firstLine.split(/\s+/)[0]?.trim() ?? "";
+  if (firstWord.length < 2) return null;
+  return firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
+}
+
 export async function sendResumeRoastEmail({
   to,
   atsScore,
@@ -24,6 +41,7 @@ export async function sendResumeRoastEmail({
   missingKeywords,
   rewrittenResume,
   jobRole,
+  candidateFirstName,
 }: {
   to: string;
   atsScore: number;
@@ -33,9 +51,15 @@ export async function sendResumeRoastEmail({
   missingKeywords?: string[];
   rewrittenResume?: string;
   jobRole?: string;
+  /** First name from the resume (e.g. first line); overrides email-derived name for subject */
+  candidateFirstName?: string | null;
 }) {
-  const from = process.env.EMAIL_FROM ?? "Resume Roast <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM ?? "Resume Roaster <onboarding@resend.dev>";
   const resend = getResend();
+  const firstName = candidateFirstName ?? getFirstNameFromEmail(to);
+  const subject = firstName
+    ? `${firstName}, your resume was just roasted! 🔥`
+    : "Your resume was just roasted! 🔥";
 
   const roleHeading = jobRole ? ` for ${escapeHtml(jobRole)}` : "";
 
@@ -60,7 +84,7 @@ export async function sendResumeRoastEmail({
       ),
       `</ul>`,
       bulletImprovements.length > 10
-        ? `<p style="margin:0 0 16px 0;font-size:14px;color:#666;">… and ${bulletImprovements.length - 10} more. <a href="${resultsLink}">View full report</a></p>`
+        ? `<p style="margin:0 0 16px 0;font-size:14px;color:#666;">… and ${bulletImprovements.length - 10} more.</p>`
         : ""
     );
   }
@@ -77,10 +101,7 @@ export async function sendResumeRoastEmail({
     const truncated = rewrittenResume.length > 1500;
     sections.push(
       `<h2 style="font-size:16px;margin:16px 0 8px 0;color:#333;">Improved resume</h2>`,
-      `<pre style="margin:0 0 16px 0;white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.4;color:#444;background:#f5f5f5;padding:12px;border-radius:6px;">${escapeHtml(preview)}${truncated ? "\n\n…" : ""}</pre>`,
-      truncated
-        ? `<p style="margin:0 0 16px 0;"><a href="${resultsLink}">View and download full improved resume</a></p>`
-        : ""
+      `<pre style="margin:0 0 16px 0;white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.4;color:#444;background:#f5f5f5;padding:12px;border-radius:6px;">${escapeHtml(preview)}${truncated ? "\n\n…" : ""}</pre>`
     );
   }
 
@@ -88,9 +109,15 @@ export async function sendResumeRoastEmail({
     `<p style="margin:20px 0 0 0;padding-top:16px;border-top:1px solid #eee;"><a href="${resultsLink}" style="color:#0066cc;">View full report online</a></p>`
   );
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
+  const logoUrl = baseUrl ? `${baseUrl}/logo.png` : "";
+  const logoBlock = logoUrl
+    ? `<p style="margin:0 0 20px 0;"><img src="${logoUrl}" alt="Resume Roaster" width="280" height="112" style="display:block;max-width:280px;height:auto;" /></p>`
+    : "";
+
   const html = `
     <div style="max-width:600px;font-family:sans-serif;color:#222;">
-      <p>Your resume roast is ready.</p>
+      ${logoBlock}
       ${sections.join("")}
     </div>
   `;
@@ -98,7 +125,7 @@ export async function sendResumeRoastEmail({
   const { data, error } = await resend.emails.send({
     from,
     to: [to],
-    subject: "Your Resume Roast Is Ready 🔥",
+    subject,
     html,
   });
   if (error) {

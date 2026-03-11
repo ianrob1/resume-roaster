@@ -31,6 +31,7 @@ export function Hero() {
   const [roastSubmitted, setRoastSubmitted] = useState(false);
   const [jobRoles, setJobRoles] = useState<string[]>(DEFAULT_JOB_ROLES);
   const [experienceLevels, setExperienceLevels] = useState<string[]>(DEFAULT_EXPERIENCE_LEVELS);
+  const [formExiting, setFormExiting] = useState(false);
 
   useEffect(() => {
     fetch("/api/options")
@@ -71,6 +72,15 @@ export function Hero() {
             <p className="mt-6 text-lg text-foreground/80 max-w-lg">
               Get an ATS score, brutal feedback, and a rewritten resume in 60 seconds with your own personal resume roast.
             </p>
+            <div className="mt-4 flex flex-wrap items-center">
+              <div className="flex flex-col items-center pr-4">
+                <p className="text-2xl font-bold leading-tight text-foreground">$19</p>
+                <p className="mt-0.5 text-sm text-foreground/70">One-time</p>
+              </div>
+              <div className="flex items-center border-l-2 border-foreground/50 pl-4 self-stretch min-h-[2.75rem]">
+                <p className="text-foreground/80">Stands between you and your next interview.</p>
+              </div>
+            </div>
           </div>
 
           <div className="mt-8 space-y-5 flex flex-col items-center md:items-stretch">
@@ -115,11 +125,15 @@ export function Hero() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFileUrl(null);
-                        setFileName(null);
-                        setEmail("");
-                        setRoastSubmitted(false);
-                        setRoastError(null);
+                        setFormExiting(true);
+                        setTimeout(() => {
+                          setFileUrl(null);
+                          setFileName(null);
+                          setEmail("");
+                          setRoastSubmitted(false);
+                          setRoastError(null);
+                          setFormExiting(false);
+                        }, 120);
                       }}
                       className="ml-2 text-sm text-[var(--accent)] hover:underline shrink-0 cursor-pointer"
                     >
@@ -130,8 +144,8 @@ export function Hero() {
               </div>
             </div>
 
-            {fileUrl && !roastSubmitted && (
-              <div className="mt-4 space-y-4 w-full max-w-xl md:max-w-none mx-auto md:mx-0 text-left animate-in fade-in slide-in-from-top-2 duration-200">
+            {(fileUrl && !roastSubmitted) || formExiting ? (
+              <div className={`mt-4 space-y-4 w-full max-w-xl md:max-w-none mx-auto md:mx-0 text-left ${formExiting ? "upload-form-exit pointer-events-none" : "upload-form-enter"}`}>
                 <div className="grid gap-4 sm:grid-cols-2 text-left">
                   <div className="space-y-1.5 text-left">
                     <label htmlFor="hero-job-role" className="block text-sm font-medium text-foreground text-left pl-3 md:pl-4">
@@ -173,12 +187,12 @@ export function Hero() {
                       if (roastError) setRoastError(null);
                     }}
                     placeholder="you@example.com"
-                    className="h-12 w-full rounded-box border-2 border-foreground/15 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 hover:border-foreground/25 focus:border-[#e87b35] focus:outline-none focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10"
+                    className={`h-12 w-full rounded-box border-2 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10 ${email.trim() ? "border-[#e87b35]" : "border-foreground/15 hover:border-foreground/25 focus:border-[#e87b35]"}`}
                   />
                 </div>
                 <button
                   type="button"
-                  disabled={!experienceLevel || !email.trim() || roastLoading}
+                  disabled={!experienceLevel || !email.trim() || roastLoading || formExiting}
                   onClick={async () => {
                     if (!fileUrl || !experienceLevel || !email.trim()) return;
                     setRoastError(null);
@@ -207,10 +221,15 @@ export function Hero() {
                   }}
                   className={`w-full max-w-xl md:max-w-none mx-auto md:mx-0 rounded-box py-3 text-base font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${roastError ? "bg-red-500 text-white hover:bg-red-600" : "bg-[#e87b35] text-white hover:bg-[#d96d2b]"}`}
                 >
-                  {roastLoading ? "Submitting…" : roastError ? roastError : "Roast your resume"}
+                  {roastLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden />
+                      Submitting…
+                    </span>
+                  ) : roastError ? roastError : "Roast your resume"}
                 </button>
               </div>
-            )}
+            ) : null}
 
             {fileUrl && roastSubmitted && (
               <p className="mt-4 text-sm font-medium text-foreground/80">We&apos;re roasting your resume. Check back soon.</p>
@@ -242,6 +261,7 @@ export function Hero() {
                 <p className="mt-0.5 text-sm text-foreground/70">4.5 Average user rating</p>
               </div>
             </div>
+            <p className="mt-3 text-center text-xs text-gray-500 md:text-left">Resume Roaster users report a measurable increase in interview callbacks.</p>
           </div>
         </div>
 
@@ -249,7 +269,7 @@ export function Hero() {
           <div className="relative w-full max-w-lg animate-slide-in-right">
             <img
               src="/hero-schematic.jpg"
-              alt="Resume Roast — upload, get roasted, get results"
+              alt="Resume Roaster — upload, get roasted, get results"
               className="w-full h-auto object-contain rounded-2xl"
             />
           </div>

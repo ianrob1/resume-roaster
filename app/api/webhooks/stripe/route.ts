@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { runAnalysis } from "@/lib/analysis";
 import { getResumeRecord } from "@/lib/airtable";
-import { sendResumeRoastEmail } from "@/lib/email";
+import { getFirstNameFromResumeText, sendResumeRoastEmail } from "@/lib/email";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -70,6 +70,7 @@ export async function POST(request: Request) {
         missingKeywords: result.missing_keywords,
         rewrittenResume: result.rewritten_resume,
         jobRole: record.job_role,
+        candidateFirstName: getFirstNameFromResumeText(record.raw_text),
       });
     }
   } catch (err) {

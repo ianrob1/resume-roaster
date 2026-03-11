@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 
-const triggerClass =
-  "h-12 w-full rounded-box border-2 border-foreground/15 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 hover:border-foreground/25 focus:border-[#e87b35] focus:outline-none focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10 text-left flex items-center justify-between gap-2";
+const triggerBaseClass =
+  "h-12 w-full rounded-box border-2 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10 text-left flex items-center justify-between gap-2";
 
 interface FormSelectProps {
   id: string;
@@ -46,7 +46,7 @@ export function FormSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
-        className={triggerClass}
+        className={`${triggerBaseClass} ${value ? "border-[#e87b35]" : "border-foreground/15 hover:border-foreground/25 focus:border-[#e87b35]"}`}
         onClick={() => setOpen((o) => !o)}
       >
         <span className={isPlaceholder ? "text-foreground/40" : ""}>{display}</span>

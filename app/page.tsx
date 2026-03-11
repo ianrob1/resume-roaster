@@ -67,12 +67,12 @@ const otherFeatures = [
 ];
 
 // To use your own icons: add files to public/icons/ (e.g. roast.svg), then add iconSrc: "/icons/roast.svg" to the feature object.
-// Order: [Bullet, Keyword, ATS (center/highlight), Brutal Roast, AI Rewrite]
+// Order: [Bullet, ATS, Brutal Roast (center/highlight), Keyword, AI Rewrite]
 const features = [
   otherFeatures[0],
-  otherFeatures[1],
   atsFeature,
   otherFeatures[2],
+  otherFeatures[1],
   otherFeatures[3],
 ];
 
@@ -86,27 +86,28 @@ export default function Home() {
           What you get
         </h2>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5 justify-items-center sm:justify-items-stretch">
-          {features.map((f) => {
+          {features.map((f, index) => {
+            const isCenter = index === 2;
             const isATS = f.title === "ATS Compatibility Score";
             const isBullet = f.title === "Bullet Point Rewrites";
-            const iconSize = isATS ? "size-12" : isBullet ? "size-8" : "size-10";
-            const iconPx = isATS ? 48 : isBullet ? 32 : 40;
+            const iconSize = isCenter ? "size-14" : isATS ? "size-12" : isBullet ? "size-8" : "size-10";
+            const iconPx = isCenter ? 56 : isATS ? 48 : isBullet ? 32 : 40;
             return (
               <div
                 key={f.title}
                 className={`relative rounded-xl border p-6 shadow-sm w-full max-w-sm sm:max-w-none ${
-                  isATS
-                    ? "border-[#d96d2b] bg-gradient-to-b from-[#e87b35] to-[#d96d2b] p-6 text-white shadow-[0_4px_0_0_rgba(0,0,0,0.08),0_8px_16px_-4px_rgba(233,123,53,0.45),0_16px_32px_-12px_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-2 ring-[#e87b35]/50 ring-offset-2 ring-offset-background"
-                    : "border-foreground/10 bg-white"
+                  isCenter
+                    ? "card-flame-hover border-[#d96d2b] bg-gradient-to-b from-[#e87b35] to-[#d96d2b] p-6 text-white shadow-[0_4px_0_0_rgba(0,0,0,0.08),0_8px_16px_-4px_rgba(233,123,53,0.45),0_16px_32px_-12px_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.2)] ring-2 ring-[#e87b35]/50 ring-offset-2 ring-offset-background"
+                    : "card-hover-spring border-foreground/10 bg-white hover:ring-2 hover:ring-[#e87b35] hover:ring-offset-2"
                 }`}
               >
                 {isATS && <ATSInfoButton />}
-                <div className="mb-3 flex items-center justify-center" aria-hidden>
+                <div className={`mb-3 flex h-14 items-center justify-center ${isCenter ? "flame-icon" : ""}`} aria-hidden>
                   {"iconSrc" in f && f.iconSrc ? (
                     <img
                       src={f.iconSrc}
                       alt=""
-                      className={`${iconSize} object-contain ${isATS ? "icon-tint-white" : "icon-tint-orange"}`}
+                      className={`${iconSize} object-contain ${isCenter ? "icon-tint-white" : "icon-tint-orange"}`}
                       width={iconPx}
                       height={iconPx}
                     />
@@ -114,8 +115,13 @@ export default function Home() {
                     f.icon
                   )}
                 </div>
-                <h3 className={`font-semibold ${isATS ? "text-white" : "text-foreground"}`}>{f.title}</h3>
-                <p className={`mt-2 text-sm ${isATS ? "text-white/90" : "text-foreground/70"}`}>{f.desc}</p>
+                <h3 className={`min-h-[2.5rem] flex items-center font-semibold whitespace-nowrap ${isCenter ? "text-white" : "text-foreground"}`}>
+                  {f.title}
+                  {f.title === "Brutal Roast Feedback" && (
+                    <sup className="ml-0.5 text-[0.5em] align-super opacity-80">TM</sup>
+                  )}
+                </h3>
+                <p className={`mt-2 text-sm ${isCenter ? "text-white/90" : "text-foreground/70"}`}>{f.desc}</p>
               </div>
             );
           })}

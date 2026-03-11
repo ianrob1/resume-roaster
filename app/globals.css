@@ -90,3 +90,65 @@ select.rounded-box {
 .animate-slide-in-right {
   animation: slide-in-right 0.6s ease-out forwards;
 }
+
+/* After upload: form entries appear with smooth animation */
+@keyframes upload-form-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.upload-form-enter {
+  animation: upload-form-enter 0.4s ease-out forwards;
+}
+
+/* When Remove is clicked: form exits quickly, minimal fade */
+@keyframes upload-form-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateY(-6px);
+  }
+}
+.upload-form-exit {
+  animation: upload-form-exit 0.12s ease-out forwards;
+}
+
+/* Shared: fast springy hover (overshoot curve) */
+.card-hover-spring {
+  transition: box-shadow 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Brutal Roast card: glow is permanent; flame icon animates on hover */
+.card-flame-hover {
+  box-shadow: 0 4px 0 0 rgba(0,0,0,0.08), 0 8px 16px -4px rgba(233,123,53,0.45), 0 16px 32px -12px rgba(0,0,0,0.15), inset 0 1px 0 0 rgba(255,255,255,0.2), 0 0 24px rgba(232,123,53,0.5), 0 0 48px rgba(232,123,53,0.25);
+  filter: brightness(1.05);
+}
+.card-flame-hover:hover .flame-icon {
+  animation: flame-icon-flicker 0.5s ease-in-out infinite;
+}
+@keyframes flame-icon-flicker {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.06);
+    filter: brightness(1.15);
+  }
+  50% {
+    transform: scale(0.98);
+    filter: brightness(0.95);
+  }
+  75% {
+    transform: scale(1.04);
+    filter: brightness(1.1);
+  }
+}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getResumeRecord } from "@/lib/airtable";
+import { getFirstNameFromResumeText } from "@/lib/email";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -45,6 +46,7 @@ export async function GET(request: Request) {
       recordId: record.id,
       status: record.status,
       email: record.email,
+      candidate_first_name: getFirstNameFromResumeText(record.raw_text),
       job_role: record.job_role,
       ats_score: record.ats_score,
       roast_text: record.roast_text,
