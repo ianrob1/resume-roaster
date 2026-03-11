@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   description:
     "Upload your resume and receive brutal but useful feedback, an ATS score, and a rewritten version.",
   icons: {
-    icon: "/logo.png?v=2",
-    shortcut: "/logo.png?v=2",
-    apple: "/logo.png?v=2",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 
