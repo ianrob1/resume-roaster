@@ -66,8 +66,8 @@ export function Hero() {
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
         <div className="text-center md:text-left">
           <div className="text-left">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Your resume probably <span className="font-marker text-4xl sm:text-5xl" style={{ fontFamily: '"Knewave", cursive' }}><span className="text-[#e87b35]">sucks</span><span className="text-foreground">!</span></span>
+            <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl">
+              Your resume probably <span className="font-marker text-5xl sm:text-6xl" style={{ fontFamily: '"Knewave", cursive' }}><span className="text-[#e87b35]">sucks</span><span className="text-foreground">!</span></span>
             </h1>
             <p className="mt-6 text-lg text-foreground/80 max-w-lg">
               Get an ATS score, brutal feedback, and a rewritten resume in 60 seconds with your own personal resume roast.
@@ -77,8 +77,8 @@ export function Hero() {
                 <p className="text-2xl font-bold leading-tight text-foreground">$19</p>
                 <p className="mt-0.5 text-sm text-foreground/70">One-time</p>
               </div>
-              <div className="flex items-center border-l-2 border-foreground/50 pl-4 self-stretch min-h-[2.75rem]">
-                <p className="text-foreground/80">Stands between you and your next interview.</p>
+              <div className="flex min-w-0 items-center overflow-x-auto border-l-2 border-foreground/50 pl-4 self-stretch min-h-[2.75rem]">
+                <p className="whitespace-nowrap text-sm text-foreground/80 sm:text-base">Stands between you and your next interview.</p>
               </div>
             </div>
           </div>
