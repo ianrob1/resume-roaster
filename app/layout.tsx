@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   title: "Resume Roast — Get your resume roasted in 60 seconds",
   description:
     "Upload your resume and receive brutal but useful feedback, an ATS score, and a rewritten version.",
+  icons: {
+    icon: "/logo.png?v=2",
+    shortcut: "/logo.png?v=2",
+    apple: "/logo.png?v=2",
+  },
 };
 
 export default function RootLayout({
