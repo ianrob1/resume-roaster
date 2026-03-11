@@ -1,4 +1,4 @@
-import type { BulletImprovement, JobRole } from "./airtable";
+import type { BulletImprovement } from "./airtable";
 
 export interface ResumeAnalysisResult {
   ats_score: number;
@@ -28,7 +28,7 @@ Return valid JSON only, no markdown or extra text, with this exact shape:
 
 export function buildUserContent(
   resumeText: string,
-  jobRole: JobRole,
+  jobRole: string,
   experienceLevel?: string
 ): string {
   return `Resume Text:\n${resumeText}\n\nTarget Role: ${jobRole}${experienceLevel ? `\nExperience Level: ${experienceLevel}` : ""}`;

@@ -1,4 +1,3 @@
-import type { JobRole } from "./airtable";
 import { analyzeWithClaude } from "./claude";
 import { analyzeWithGemini } from "./gemini";
 import { analyzeWithOpenAI } from "./openai";
@@ -12,7 +11,7 @@ export type { ResumeAnalysisResult };
  */
 export async function analyzeResume(
   resumeText: string,
-  jobRole: JobRole,
+  jobRole: string,
   experienceLevel?: string
 ): Promise<ResumeAnalysisResult> {
   const args = [resumeText, jobRole, experienceLevel] as const;

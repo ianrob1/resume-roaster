@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { ATSInfoButtonLight } from "@/components/ATSInfoButton";
+import { FormSelect } from "@/components/FormSelect";
 
-const JOB_ROLES = [
-  "Software Engineer",
-  "Product Manager",
-  "Marketing",
-  "Sales",
+const DEFAULT_JOB_ROLES = [
   "Finance",
+  "Marketing",
   "Other",
-] as const;
+  "Product Manager",
+  "Sales",
+  "Software Engineer",
+].sort((a, b) => a.localeCompare(b));
 
-const EXPERIENCE_LEVELS = ["Entry", "Mid", "Senior"] as const;
+const EXPERIENCE_LEVEL_ORDER = ["Internship", "Entry", "Intermediate", "Senior"];
+const DEFAULT_EXPERIENCE_LEVELS = [...EXPERIENCE_LEVEL_ORDER];
 
 export function Hero() {
   const router = useRouter();
@@ -27,21 +29,53 @@ export function Hero() {
   const [roastLoading, setRoastLoading] = useState(false);
   const [roastError, setRoastError] = useState<string | null>(null);
   const [roastSubmitted, setRoastSubmitted] = useState(false);
+  const [jobRoles, setJobRoles] = useState<string[]>(DEFAULT_JOB_ROLES);
+  const [experienceLevels, setExperienceLevels] = useState<string[]>(DEFAULT_EXPERIENCE_LEVELS);
+
+  useEffect(() => {
+    fetch("/api/options")
+      .then((res) => res.json())
+      .then((data: { job_roles?: string[]; experience_levels?: string[] }) => {
+        if (Array.isArray(data.job_roles) && data.job_roles.length) setJobRoles([...data.job_roles].sort((a, b) => a.localeCompare(b)));
+        if (Array.isArray(data.experience_levels) && data.experience_levels.length) {
+          const order = EXPERIENCE_LEVEL_ORDER;
+          setExperienceLevels(
+            [...data.experience_levels].sort((a, b) => {
+              const i = order.indexOf(a);
+              const j = order.indexOf(b);
+              if (i === -1 && j === -1) return a.localeCompare(b);
+              if (i === -1) return 1;
+              if (j === -1) return -1;
+              return i - j;
+            })
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!roastError) return;
+    const t = setTimeout(() => setRoastError(null), 2000);
+    return () => clearTimeout(t);
+  }, [roastError]);
 
   return (
     <section className="mx-auto max-w-6xl px-4 pt-0 pb-16 sm:pb-20">
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
         <div className="text-center md:text-left">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Your resume probably <span className="font-marker text-4xl sm:text-5xl" style={{ fontFamily: '"Knewave", cursive' }}><span className="text-[#e87b35]">sucks</span><span className="text-foreground">!</span></span>
-          </h1>
-          <p className="mt-6 text-lg text-foreground/80 max-w-lg md:max-w-lg mx-auto md:mx-0">
-            Get an ATS score, brutal feedback, and a rewritten resume in 60 seconds with your own personal resume roast.
-          </p>
+          <div className="text-left">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+              Your resume probably <span className="font-marker text-4xl sm:text-5xl" style={{ fontFamily: '"Knewave", cursive' }}><span className="text-[#e87b35]">sucks</span><span className="text-foreground">!</span></span>
+            </h1>
+            <p className="mt-6 text-lg text-foreground/80 max-w-lg">
+              Get an ATS score, brutal feedback, and a rewritten resume in 60 seconds with your own personal resume roast.
+            </p>
+          </div>
 
           <div className="mt-8 space-y-5 flex flex-col items-center md:items-stretch">
             <div
-              className={`flex w-full max-w-xl md:max-w-none rounded-xl border-2 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] overflow-hidden h-12 transition-colors ${fileUrl ? "cursor-default border-solid border-[#e87b35]" : "cursor-pointer border-dashed border-foreground/25 hover:border-[#e87b35]"}`}
+              className={`flex w-full max-w-xl md:max-w-none rounded-box border-2 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] overflow-hidden h-12 transition-colors ${fileUrl ? "cursor-default border-solid border-[#e87b35]" : "cursor-pointer border-dashed border-foreground/25 hover:border-[#e87b35]"}`}
             >
               <div className="flex-1 min-w-0 flex rounded-l-xl rounded-r-xl overflow-hidden [&_[data-ut-element]]:!mt-0 [&_[data-ut-element=allowed-content]]:!hidden [&_[data-ut-element=button]]:!hidden [&_[data-ut-element=upload-icon]]:!hidden [&_[data-ut-element]]:!cursor-pointer">
                 {!fileUrl ? (
@@ -97,52 +131,49 @@ export function Hero() {
             </div>
 
             {fileUrl && !roastSubmitted && (
-              <div className="mt-4 space-y-4 w-full max-w-xl md:max-w-none mx-auto md:mx-0 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label htmlFor="hero-job-role" className="block text-sm font-medium text-foreground">
+              <div className="mt-4 space-y-4 w-full max-w-xl md:max-w-none mx-auto md:mx-0 text-left animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="grid gap-4 sm:grid-cols-2 text-left">
+                  <div className="space-y-1.5 text-left">
+                    <label htmlFor="hero-job-role" className="block text-sm font-medium text-foreground text-left pl-3 md:pl-4">
                       Target role
                     </label>
-                    <select
+                    <FormSelect
                       id="hero-job-role"
                       value={jobRole}
-                      onChange={(e) => setJobRole(e.target.value)}
-                      className="w-full rounded-xl border border-foreground/20 bg-white px-4 py-2.5 text-sm text-foreground focus:border-[#e87b35] focus:outline-none focus:ring-2 focus:ring-[#e87b35]/20"
-                    >
-                      <option value="">Select role</option>
-                      {JOB_ROLES.map((r) => (
-                        <option key={r} value={r}>{r}</option>
-                      ))}
-                    </select>
+                      onChange={setJobRole}
+                      options={jobRoles}
+                      placeholder="Select role"
+                      aria-label="Target role"
+                    />
                   </div>
-                  <div className="space-y-1.5">
-                    <label htmlFor="hero-experience" className="block text-sm font-medium text-foreground">
+                  <div className="space-y-1.5 text-left">
+                    <label htmlFor="hero-experience" className="block text-sm font-medium text-foreground text-left pl-3 md:pl-4">
                       Experience level
                     </label>
-                    <select
+                    <FormSelect
                       id="hero-experience"
                       value={experienceLevel}
-                      onChange={(e) => setExperienceLevel(e.target.value)}
-                      className="w-full rounded-xl border border-foreground/20 bg-white px-4 py-2.5 text-sm text-foreground focus:border-[#e87b35] focus:outline-none focus:ring-2 focus:ring-[#e87b35]/20"
-                    >
-                      <option value="">Select level</option>
-                      {EXPERIENCE_LEVELS.map((l) => (
-                        <option key={l} value={l}>{l}</option>
-                      ))}
-                    </select>
+                      onChange={setExperienceLevel}
+                      options={experienceLevels}
+                      placeholder="Select level"
+                      aria-label="Experience level"
+                    />
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="hero-email" className="block text-sm font-medium text-foreground">
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="hero-email" className="block text-sm font-medium text-foreground text-left pl-3 md:pl-4">
                     Email
                   </label>
                   <input
                     id="hero-email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (roastError) setRoastError(null);
+                    }}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border border-foreground/20 bg-white px-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 focus:border-[#e87b35] focus:outline-none focus:ring-2 focus:ring-[#e87b35]/20"
+                    className="h-12 w-full rounded-box border-2 border-foreground/15 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 hover:border-foreground/25 focus:border-[#e87b35] focus:outline-none focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10"
                   />
                 </div>
                 <button
@@ -174,9 +205,9 @@ export function Hero() {
                       setRoastLoading(false);
                     }
                   }}
-                  className="w-full max-w-xl md:max-w-none mx-auto md:mx-0 rounded-xl bg-[#e87b35] py-3 text-base font-semibold text-white transition hover:bg-[#d96d2b] disabled:cursor-not-allowed disabled:opacity-50"
+                  className={`w-full max-w-xl md:max-w-none mx-auto md:mx-0 rounded-box py-3 text-base font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${roastError ? "bg-red-500 text-white hover:bg-red-600" : "bg-[#e87b35] text-white hover:bg-[#d96d2b]"}`}
                 >
-                  {roastLoading ? "Submitting…" : "Roast your resume"}
+                  {roastLoading ? "Submitting…" : roastError ? roastError : "Roast your resume"}
                 </button>
               </div>
             )}
@@ -188,10 +219,6 @@ export function Hero() {
             {error && (
               <p className="text-sm text-red-600">{error}</p>
             )}
-            {roastError && (
-              <p className="text-sm text-red-600">{roastError}</p>
-            )}
-
             <div className="flex flex-wrap gap-8 pt-4 border-t border-foreground/10 justify-center md:justify-start">
               <div className="flex flex-col">
                 <p className="min-h-[2rem] text-2xl font-bold leading-tight text-foreground">87.3%</p>
@@ -201,11 +228,11 @@ export function Hero() {
                 </p>
               </div>
               <div className="flex flex-col">
-                <p className="min-h-[2rem] text-2xl font-bold leading-tight text-foreground">15.2k</p>
+                <p className="min-h-[2rem] text-2xl font-bold leading-tight text-foreground">~15.2k</p>
                 <p className="mt-0.5 text-sm text-foreground/70">Resumes roasted</p>
               </div>
-              <div className="flex flex-col">
-                <p className="flex min-h-[2rem] items-center leading-tight text-foreground" aria-hidden>
+              <div className="flex flex-col items-center">
+                <p className="flex min-h-[2rem] items-center justify-center leading-tight text-foreground" aria-hidden>
                   <span className="text-lg font-bold">★★★★</span>
                   <span className="relative inline-block text-lg font-bold">
                     <span className="text-foreground/30">☆</span>
@@ -219,7 +246,7 @@ export function Hero() {
         </div>
 
         <div className="flex justify-center lg:justify-end">
-          <div className="relative w-full max-w-lg">
+          <div className="relative w-full max-w-lg animate-slide-in-right">
             <img
               src="/hero-schematic.jpg"
               alt="Resume Roast — upload, get roasted, get results"

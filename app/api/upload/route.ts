@@ -2,15 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createResumeRecord } from "@/lib/airtable";
 import { extractResumeText } from "@/lib/resume-parser";
-import type { JobRole, ExperienceLevel } from "@/lib/airtable";
 
 export const runtime = "nodejs";
 
 const uploadSchema = z.object({
   resume_file: z.string().url(),
-  experience_level: z.enum(["Entry", "Mid", "Senior"]),
-  job_role: z.enum(["Software Engineer", "Product Manager", "Marketing", "Sales", "Finance", "Other"]).optional(),
-  email: z.string().email().optional(),
+  experience_level: z.string().min(1, "Experience level is required"),
+  job_role: z.string().optional(),
+  email: z.string().refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), { message: "Invalid email" }).optional(),
 });
 
 function getErrorMessage(err: unknown): string {
@@ -24,8 +23,14 @@ export async function POST(request: Request) {
     const body = await request.json();
     const parsed = uploadSchema.safeParse(body);
     if (!parsed.success) {
+      const flat = parsed.error.flatten();
+      const firstMessage =
+        (flat.fieldErrors.email?.[0] as string) ??
+        (flat.fieldErrors.experience_level?.[0] as string) ??
+        (flat.fieldErrors.resume_file?.[0] as string) ??
+        "Invalid input";
       return NextResponse.json(
-        { error: "Invalid input", details: parsed.error.flatten() },
+        { error: firstMessage, details: flat },
         { status: 400 }
       );
     }
@@ -53,8 +58,8 @@ export async function POST(request: Request) {
       record = await createResumeRecord({
         email: email?.trim() ?? "",
         resume_file,
-        job_role: (job_role as JobRole) ?? "Other",
-        experience_level: experience_level as ExperienceLevel,
+        job_role: job_role?.trim() || "Other",
+        experience_level: experience_level.trim(),
         raw_text,
       });
     } catch (err) {

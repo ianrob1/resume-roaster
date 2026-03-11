@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import type { JobRole } from "./airtable";
 import {
   SYSTEM_PROMPT,
   buildUserContent,
@@ -17,7 +16,7 @@ function getOpenAI() {
 
 export async function analyzeWithOpenAI(
   resumeText: string,
-  jobRole: JobRole,
+  jobRole: string,
   experienceLevel?: string
 ): Promise<ResumeAnalysisResult> {
   const userContent = buildUserContent(resumeText, jobRole, experienceLevel);

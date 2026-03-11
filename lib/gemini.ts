@@ -1,5 +1,4 @@
 import { GoogleGenAI } from "@google/genai";
-import type { JobRole } from "./airtable";
 import {
   SYSTEM_PROMPT,
   buildUserContent,
@@ -15,7 +14,7 @@ function getGemini() {
 
 export async function analyzeWithGemini(
   resumeText: string,
-  jobRole: JobRole,
+  jobRole: string,
   experienceLevel?: string
 ): Promise<ResumeAnalysisResult> {
   const userContent = buildUserContent(resumeText, jobRole, experienceLevel);

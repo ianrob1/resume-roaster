@@ -1,5 +1,4 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { JobRole } from "./airtable";
 import {
   SYSTEM_PROMPT,
   buildUserContent,
@@ -15,7 +14,7 @@ function getAnthropic() {
 
 export async function analyzeWithClaude(
   resumeText: string,
-  jobRole: JobRole,
+  jobRole: string,
   experienceLevel?: string
 ): Promise<ResumeAnalysisResult> {
   const userContent = buildUserContent(resumeText, jobRole, experienceLevel);

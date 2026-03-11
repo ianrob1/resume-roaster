@@ -6,8 +6,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Resume Roaster — Get your resume roasted in 60 seconds",
-  description:
-    "Resume Roaster — Upload your resume and receive brutal but useful feedback, an ATS score, and a rewritten version.",
+  description: "Resume Roaster — Get roasted, get hired.",
   icons: {
     icon: [
       { url: "/favicon.png", sizes: "32x32", type: "image/png" },

@@ -12,7 +12,7 @@ const JOB_ROLES = [
   "Other",
 ] as const;
 
-const EXPERIENCE_LEVELS = ["Entry", "Mid", "Senior"] as const;
+const EXPERIENCE_LEVELS = ["Internship", "Entry", "Intermediate", "Senior"] as const;
 
 export function UploadForm() {
   const [fileUrl, setFileUrl] = useState<string | null>(null);

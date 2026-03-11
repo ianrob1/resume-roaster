@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { ExampleRoastsMarquee } from "@/components/ExampleRoastsMarquee";
 import { Hero } from "@/components/Hero";
@@ -9,13 +10,12 @@ const atsIconClass = "size-10 text-white";
 const atsFeature = {
   title: "ATS Compatibility Score",
   desc: "See how well your resume passes applicant tracking systems.",
+  iconSrc: "/icons/ats.png",
   icon: (
     <svg className={atsIconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M9 3v1M15 3v1M8 4v1M16 4v1" />
-      <rect x="5" y="6" width="14" height="12" rx="2" />
-      <circle cx="9.5" cy="10.5" r="1.25" fill="currentColor" />
-      <circle cx="14.5" cy="10.5" r="1.25" fill="currentColor" />
-      <path d="M9 15h6" />
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 8v4l2 2" />
     </svg>
   ),
 };
@@ -24,45 +24,49 @@ const otherFeatures = [
   {
     title: "Bullet Point Rewrites",
     desc: "Get before/after versions of weak bullets.",
+    iconSrc: "/icons/bullet.png",
     icon: (
       <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M9 6h12M9 12h12M9 18h12M3 6h.01M3 12h.01M3 18h.01" />
-        <path d="M3 6c0 .55.45 1 1 1s1-.45 1-1-.45-1-1-1-1 .45-1 1zM3 12c0 .55.45 1 1 1s1-.45 1-1-.45-1-1-1-1 .45-1 1zM3 18c0 .55.45 1 1 1s1-.45 1-1-.45-1-1-1-1 .45-1 1z" fill="currentColor" stroke="none" />
+        <path d="M4 6h12M4 12h8M4 18h10" />
+        <path d="M16 8l2 2-2 2M16 14l2 2-2 2" />
       </svg>
     ),
   },
   {
     title: "Keyword Optimization",
     desc: "Missing keywords for your target role.",
+    iconSrc: "/icons/keyword.png",
     icon: (
       <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <circle cx="7.5" cy="15.5" r="2.5" />
-        <path d="M10 13L19 4M15 4h4v4" />
+        <path d="M12 2l2 7h7l-5.5 5 2 7L12 16l-5.5 5 2-7L3 9h7l2-7z" />
       </svg>
     ),
   },
   {
     title: "Brutal Roast Feedback",
     desc: "Honest, no-fluff feedback on what's holding your resume back.",
+    iconSrc: "/icons/roast.png",
     icon: (
       <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        <path d="M12 22c3-2 5-5 5-8 0-1.5-.5-3-1.5-4.5C13 5 12 2 12 2s-1 3-4 7.5C7 11 6.5 12.5 6.5 14c0 3 2 6 5 8z" />
       </svg>
     ),
   },
   {
     title: "AI Resume Rewrite",
     desc: "A full improved version of your resume.",
+    iconSrc: "/icons/rewrite.png",
     icon: (
       <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
-        <path d="m9 19 2 2 4-4" />
+        <path d="M12 18l1.5-1.5M15 15l3-3" />
       </svg>
     ),
   },
 ];
 
+// To use your own icons: add files to public/icons/ (e.g. roast.svg), then add iconSrc: "/icons/roast.svg" to the feature object.
 // Order: [Bullet, Keyword, ATS (center/highlight), Brutal Roast, AI Rewrite]
 const features = [
   otherFeatures[0],
@@ -84,6 +88,9 @@ export default function Home() {
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5 justify-items-center sm:justify-items-stretch">
           {features.map((f) => {
             const isATS = f.title === "ATS Compatibility Score";
+            const isBullet = f.title === "Bullet Point Rewrites";
+            const iconSize = isATS ? "size-12" : isBullet ? "size-8" : "size-10";
+            const iconPx = isATS ? 48 : isBullet ? 32 : 40;
             return (
               <div
                 key={f.title}
@@ -95,7 +102,17 @@ export default function Home() {
               >
                 {isATS && <ATSInfoButton />}
                 <div className="mb-3 flex items-center justify-center" aria-hidden>
-                  {f.icon}
+                  {"iconSrc" in f && f.iconSrc ? (
+                    <img
+                      src={f.iconSrc}
+                      alt=""
+                      className={`${iconSize} object-contain ${isATS ? "icon-tint-white" : "icon-tint-orange"}`}
+                      width={iconPx}
+                      height={iconPx}
+                    />
+                  ) : (
+                    f.icon
+                  )}
                 </div>
                 <h3 className={`font-semibold ${isATS ? "text-white" : "text-foreground"}`}>{f.title}</h3>
                 <p className={`mt-2 text-sm ${isATS ? "text-white/90" : "text-foreground/70"}`}>{f.desc}</p>
@@ -106,7 +123,14 @@ export default function Home() {
       </section>
       <ExampleRoastsMarquee />
       <footer className="border-t border-foreground/10 py-8 text-center text-sm text-foreground/60">
-        Resume Roaster — Get roasted, get hired.
+        <p>Resume Roaster — Get roasted, get hired.</p>
+        <p className="mt-2">
+          <Link href="/terms" className="text-foreground/70 hover:text-foreground hover:underline">
+            Terms and Conditions
+          </Link>
+          {" · "}
+          All rights reserved.
+        </p>
       </footer>
     </main>
   );
