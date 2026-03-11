@@ -12,10 +12,18 @@
   --accent-hover: #ea580c;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+  /* Prevent zoom-out from showing content narrower than viewport (mobile) */
+  min-width: 100%;
+  width: 100%;
 }
 
 .font-marker {
