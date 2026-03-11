@@ -25,7 +25,15 @@ export async function POST(request: Request) {
     }
 
     if (session_id) {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+      let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+      if (!baseUrl) {
+        try {
+          const u = new URL(request.url);
+          baseUrl = `${u.protocol}//${u.host}`;
+        } catch {
+          baseUrl = "http://localhost:3000";
+        }
+      }
       const resultsLink = `${baseUrl}/results?session_id=${encodeURIComponent(session_id)}`;
       await sendResumeRoastEmail({
         to: record.email,

@@ -31,7 +31,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ??
+      (() => {
+        try {
+          const u = new URL(request.url);
+          return `${u.protocol}//${u.host}`;
+        } catch {
+          return "http://localhost:3000";
+        }
+      })();
     const priceId = process.env.STRIPE_PRICE_ID;
     if (!priceId) {
       return NextResponse.json(

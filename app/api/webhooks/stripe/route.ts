@@ -50,7 +50,16 @@ export async function POST(request: Request) {
     const result = await runAnalysis(recordId);
     const record = await getResumeRecord(recordId);
     if (record && session.id) {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+      const baseUrl =
+        process.env.NEXT_PUBLIC_APP_URL ??
+        (() => {
+          try {
+            const u = new URL(request.url);
+            return `${u.protocol}//${u.host}`;
+          } catch {
+            return "http://localhost:3000";
+          }
+        })();
       const resultsLink = `${baseUrl}/results?session_id=${encodeURIComponent(session.id)}`;
       await sendResumeRoastEmail({
         to: record.email,
