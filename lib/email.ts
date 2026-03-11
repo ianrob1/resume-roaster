@@ -68,7 +68,9 @@ export async function sendResumeRoastEmail({
 
   const roleHeading = jobRole ? ` for ${escapeHtml(jobRole)}` : "";
 
+  const viewReportLink = `<p style="margin:0 0 12px 0;"><a href="${resultsLink}" style="color:#0066cc;">View full report online</a></p>`;
   const sections: string[] = [
+    viewReportLink,
     `<p style="font-size:18px;margin:0 0 8px 0;"><strong>ATS Score: ${atsScore} / 100</strong></p>`,
   ];
 
@@ -109,10 +111,6 @@ export async function sendResumeRoastEmail({
       `<pre style="margin:0 0 16px 0;white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.4;color:#444;background:#f5f5f5;padding:12px;border-radius:6px;">${escapeHtml(preview)}${truncated ? "\n\n…" : ""}</pre>`
     );
   }
-
-  sections.push(
-    `<p style="margin:20px 0 0 0;padding-top:16px;border-top:1px solid #eee;"><a href="${resultsLink}" style="color:#0066cc;">View full report online</a></p>`
-  );
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
   const logoUrl = baseUrl ? `${baseUrl}/logo.png` : "";

@@ -12,15 +12,18 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+// Build-time cache buster so production/CDN can't serve old favicon (Vercel sets VERCEL_GIT_COMMIT_SHA)
+const faviconVersion = process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.VERCEL_GIT_COMMIT_REF ?? "v1";
+
 export const metadata: Metadata = {
   title: "Resume Roaster — Get your resume roasted in 60 seconds",
   description: "Resume Roaster — Get roasted, get hired.",
   icons: {
     icon: [
-      { url: "/favicon-32.png?v=2", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16.png?v=2", sizes: "16x16", type: "image/png" },
+      { url: `/favicon-32.png?v=${faviconVersion}`, sizes: "32x32", type: "image/png" },
+      { url: `/favicon-16.png?v=${faviconVersion}`, sizes: "16x16", type: "image/png" },
     ],
-    apple: "/favicon-32.png?v=2",
+    apple: `/favicon-32.png?v=${faviconVersion}`,
   },
 };
 
