@@ -42,9 +42,12 @@ export async function extractResumeText(
   throw new Error("Unsupported file type. Use PDF or DOCX.");
 }
 
+type PdfParseFn = (buffer: Buffer) => Promise<{ text?: string }>;
+
 async function extractPdfText(buffer: Buffer): Promise<string> {
   const mod = await import("pdf-parse/lib/pdf-parse.js");
-  const pdfParse = typeof mod.default === "function" ? mod.default : mod;
+  const pdfParse: PdfParseFn =
+    typeof mod.default === "function" ? mod.default : (mod as unknown as PdfParseFn);
   const data = await pdfParse(buffer);
   return data?.text ?? "";
 }

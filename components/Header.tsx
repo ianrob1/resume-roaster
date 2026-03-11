@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 /** Upload your logo to public/logo.png (or logo.svg) — it appears in the top left. */
@@ -14,9 +15,11 @@ export function Header() {
       <div className="mx-auto flex max-w-5xl items-center justify-center px-4">
         <Link href="/" className="flex items-center gap-2">
           {!logoFailed ? (
-            <img
+            <Image
               src={LOGO_PATH}
               alt="Resume Roast"
+              width={320}
+              height={128}
               className="h-32 w-auto object-contain sm:h-40"
               onError={() => setLogoFailed(true)}
             />

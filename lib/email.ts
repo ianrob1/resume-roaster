@@ -39,7 +39,7 @@ export async function sendResumeRoastEmail({
 
   const roleHeading = jobRole ? ` for ${escapeHtml(jobRole)}` : "";
 
-  let sections: string[] = [
+  const sections: string[] = [
     `<p style="font-size:18px;margin:0 0 8px 0;"><strong>ATS Score: ${atsScore} / 100</strong></p>`,
   ];
 

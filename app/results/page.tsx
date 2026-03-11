@@ -110,6 +110,7 @@ function ResultsContent() {
       return;
     autoRunDoneRef.current = true;
     runAnalysisNow();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when we have incomplete data
   }, [loading, data?.status, data?.recordId, sessionId, triggering]);
 
   function handleDownload() {
