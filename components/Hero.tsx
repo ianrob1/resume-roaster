@@ -70,15 +70,15 @@ export function Hero() {
               Your resume probably <span className="font-marker text-5xl sm:text-6xl" style={{ fontFamily: '"Knewave", cursive' }}><span className="text-[#e87b35]">sucks</span><span className="text-foreground">!</span></span>
             </h1>
             <p className="mt-6 text-lg text-foreground/80 max-w-lg">
-              Get an ATS score, brutal feedback, and a rewritten resume in 60 seconds with your own personal resume roast.
+              Get more interviews. Upload your resume and get an ATS score, brutal feedback, and a full rewrite in 60 seconds.
             </p>
-            <div className="mt-4 flex flex-wrap items-center">
-              <div className="flex flex-col items-center pr-4">
+            <div className="mt-4 flex items-center">
+              <div className="flex flex-col items-center pr-3 sm:pr-4">
                 <p className="text-2xl font-bold leading-tight text-foreground">$19</p>
                 <p className="mt-0.5 text-sm text-foreground/70">One-time</p>
               </div>
-              <div className="flex min-w-0 items-center overflow-x-auto border-l-2 border-foreground/50 pl-4 self-stretch min-h-[2.75rem]">
-                <p className="whitespace-nowrap text-sm text-foreground/80 sm:text-base">Stands between you and your next interview.</p>
+              <div className="flex min-w-0 items-center self-stretch border-l-2 border-foreground/50 pl-3 sm:min-h-[2.75rem] sm:pl-4">
+                <p className="text-sm text-foreground/80 sm:text-base">Stands between you and your next interview.</p>
               </div>
             </div>
           </div>
