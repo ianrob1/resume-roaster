@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Header } from "@/components/Header";
 import { ExampleRoastsMarquee } from "@/components/ExampleRoastsMarquee";
 import { Hero } from "@/components/Hero";
@@ -104,12 +105,12 @@ export default function Home() {
                 {isATS && <ATSInfoButton />}
                 <div className={`mb-3 flex h-14 items-center justify-center ${isCenter ? "flame-icon" : ""}`} aria-hidden>
                   {"iconSrc" in f && f.iconSrc ? (
-                    <img
+                    <Image
                       src={f.iconSrc}
                       alt=""
-                      className={`${iconSize} object-contain ${isCenter ? "icon-tint-white" : "icon-tint-orange"}`}
                       width={iconPx}
                       height={iconPx}
+                      className={`${iconSize} object-contain ${isCenter ? "icon-tint-white" : "icon-tint-orange"}`}
                     />
                   ) : (
                     f.icon

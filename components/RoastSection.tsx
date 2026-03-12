@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface RoastSectionProps {
   text: string;
   title?: string;
@@ -9,12 +11,12 @@ export function RoastSection({ text, title = "Roast", iconSrc }: RoastSectionPro
     <div className="rounded-2xl border-2 border-foreground/10 bg-white p-6 shadow-sm sm:p-8">
       <div className="flex items-center gap-2">
         {iconSrc && (
-          <img
+          <Image
             src={iconSrc}
             alt=""
-            className="h-6 w-6 object-contain icon-tint-orange"
             width={24}
             height={24}
+            className="h-6 w-6 object-contain icon-tint-orange"
           />
         )}
         <h2 className="text-xl font-semibold text-foreground">{title}</h2>

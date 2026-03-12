@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -192,12 +193,12 @@ function ProcessingContent() {
                 }}
                 aria-hidden={!visible}
               >
-                <img
+                <Image
                   src={step.icon}
                   alt=""
-                  className={`object-contain icon-tint-orange ${i === 0 ? "h-12 w-12" : "h-16 w-16"}`}
                   width={i === 0 ? 48 : 64}
                   height={i === 0 ? 48 : 64}
+                  className={`object-contain icon-tint-orange ${i === 0 ? "h-12 w-12" : "h-16 w-16"}`}
                 />
               </div>
             );

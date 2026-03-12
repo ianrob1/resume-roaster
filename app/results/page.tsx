@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -316,12 +317,12 @@ function ResultsContent() {
         {typeof data.ats_score === "number" && (
           <section className="mb-8">
             <div className="mb-3">
-              <img
+              <Image
                 src="/icons/ats.png"
                 alt=""
-                className="h-12 w-12 object-contain icon-tint-orange"
                 width={48}
                 height={48}
+                className="h-12 w-12 object-contain icon-tint-orange"
               />
             </div>
             <ScoreCard score={data.ats_score} />
@@ -332,12 +333,12 @@ function ResultsContent() {
         {data.roast_text && (
           <section className="mb-8">
             <div className="mb-3">
-              <img
+              <Image
                 src="/icons/roast.png"
                 alt=""
-                className="h-12 w-12 object-contain icon-tint-orange"
                 width={48}
                 height={48}
+                className="h-12 w-12 object-contain icon-tint-orange"
               />
             </div>
             <RoastSection text={data.roast_text} title="The Roast" />
@@ -348,12 +349,12 @@ function ResultsContent() {
         {data.bullet_improvements && data.bullet_improvements.length > 0 && (
           <section className="mb-8">
             <div className="mb-3">
-              <img
+              <Image
                 src="/icons/bullet.png"
                 alt=""
-                className="h-8 w-8 object-contain icon-tint-orange"
                 width={32}
                 height={32}
+                className="h-8 w-8 object-contain icon-tint-orange"
               />
             </div>
             <div className="rounded-2xl border-2 border-foreground/10 bg-white p-6 shadow-sm sm:p-8">
@@ -389,12 +390,12 @@ function ResultsContent() {
         {data.missing_keywords && data.missing_keywords.length > 0 && (
           <section className="mb-8">
             <div className="mb-3">
-              <img
+              <Image
                 src="/icons/keyword.png"
                 alt=""
-                className="h-10 w-10 object-contain icon-tint-orange"
                 width={40}
                 height={40}
+                className="h-10 w-10 object-contain icon-tint-orange"
               />
             </div>
             <div className="rounded-2xl border-2 border-foreground/10 bg-white p-6 shadow-sm sm:p-8">
@@ -422,12 +423,12 @@ function ResultsContent() {
         {data.rewritten_resume && (
           <section className="mb-10">
             <div className="mb-3">
-              <img
+              <Image
                 src="/icons/rewrite.png"
                 alt=""
-                className="h-12 w-12 object-contain icon-tint-orange"
                 width={48}
                 height={48}
+                className="h-12 w-12 object-contain icon-tint-orange"
               />
             </div>
             <div className="rounded-2xl border-2 border-foreground/10 bg-white p-6 shadow-sm sm:p-8">

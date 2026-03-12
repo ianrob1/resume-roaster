@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { ATSInfoButtonLight } from "@/components/ATSInfoButton";
@@ -22,7 +23,6 @@ export function Hero() {
   const router = useRouter();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [jobRole, setJobRole] = useState<string>("");
   const [experienceLevel, setExperienceLevel] = useState<string>("");
@@ -320,9 +320,6 @@ export function Hero() {
               <p className="mt-4 text-sm font-medium text-foreground/80">We&apos;re roasting your resume. Check back soon.</p>
             )}
 
-            {error && (
-              <p className="text-sm text-red-600">{error}</p>
-            )}
             <div className="flex flex-wrap gap-8 pt-4 border-t border-foreground/10 justify-center md:justify-start">
               <div className="flex flex-col">
                 <p className="min-h-[2rem] text-2xl font-bold leading-tight text-foreground">87.3%</p>
@@ -352,9 +349,11 @@ export function Hero() {
 
         <div className="flex justify-center lg:justify-end">
           <div className="relative w-full max-w-lg animate-slide-in-right">
-            <img
+            <Image
               src="/hero-schematic.jpg"
               alt="Resume Roaster — upload, get roasted, get results"
+              width={800}
+              height={500}
               className="w-full h-auto object-contain rounded-2xl"
             />
           </div>
