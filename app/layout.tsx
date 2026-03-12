@@ -16,15 +16,15 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
-  title: "Resume Roaster — Brutal feedback. Better resume. More interviews.",
-  description: "Resume Roaster — Brutal feedback. Better resume. More interviews.",
+  title: "Resume Roaster",
+  description: "Brutal feedback. Better resume. More interviews.",
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [{ url: "/favicon.png?v=2", type: "image/png", sizes: "32x32" }],
+    apple: "/favicon.png?v=2",
   },
   openGraph: {
-    title: "Resume Roaster — Brutal feedback. Better resume. More interviews.",
-    description: "Resume Roaster — Brutal feedback. Better resume. More interviews.",
+    title: "Resume Roaster",
+    description: "Brutal feedback. Better resume. More interviews.",
     url: "/",
     siteName: "Resume Roaster",
     images: [{ url: "/logo.png", width: 640, height: 256, alt: "Resume Roaster" }],
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Resume Roaster — Brutal feedback. Better resume. More interviews.",
-    description: "Resume Roaster — Brutal feedback. Better resume. More interviews.",
+    title: "Resume Roaster",
+    description: "Brutal feedback. Better resume. More interviews.",
     images: ["/logo.png"],
   },
 };
