@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { ATSInfoButtonLight } from "@/components/ATSInfoButton";
@@ -32,6 +32,27 @@ export function Hero() {
   const [jobRoles, setJobRoles] = useState<string[]>(DEFAULT_JOB_ROLES);
   const [experienceLevels, setExperienceLevels] = useState<string[]>(DEFAULT_EXPERIENCE_LEVELS);
   const [formExiting, setFormExiting] = useState(false);
+  const [priceTilt, setPriceTilt] = useState({ x: 0, y: 0 });
+  const priceRef = useRef<HTMLDivElement>(null);
+
+  const MAX_TILT = 14;
+  const onPriceMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const el = priceRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const x = (e.clientX - centerX) / (rect.width / 2);
+      const y = (e.clientY - centerY) / (rect.height / 2);
+      setPriceTilt({
+        x: Math.max(-1, Math.min(1, x)) * -MAX_TILT,
+        y: Math.max(-1, Math.min(1, y)) * MAX_TILT,
+      });
+    },
+    []
+  );
+  const onPriceMouseLeave = useCallback(() => setPriceTilt({ x: 0, y: 0 }), []);
 
   useEffect(() => {
     fetch("/api/options")
@@ -73,9 +94,26 @@ export function Hero() {
               Get more interviews. Upload your resume and get an ATS score, brutal feedback, and a full rewrite in 60 seconds.
             </p>
             <div className="mt-4 flex items-center">
-              <div className="flex flex-col items-center pr-4 max-sm:pr-2">
-                <p className="text-2xl font-bold leading-tight text-foreground max-sm:text-xl">$19</p>
-                <p className="mt-0.5 text-sm text-foreground/70 max-sm:whitespace-nowrap max-sm:text-xs">One-time</p>
+              <div
+                ref={priceRef}
+                className="mr-2 shrink-0 origin-center"
+                style={{ perspective: "600px" }}
+                onMouseMove={onPriceMouseMove}
+                onMouseLeave={onPriceMouseLeave}
+              >
+                <div
+                  className="flex scale-90 flex-col items-center justify-center rounded-md border border-foreground/25 px-4 py-2 text-white transition-transform duration-200 ease-out max-sm:scale-85 max-sm:px-3 max-sm:py-1.5"
+                  style={{
+                    background: "linear-gradient(165deg, #f08d4a 0%, #e87b35 35%, #d96d2b 100%)",
+                    boxShadow:
+                      "inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.12), 0 12px 24px rgba(0,0,0,0.08)",
+                    transformStyle: "preserve-3d",
+                    transform: `rotateX(${priceTilt.y}deg) rotateY(${priceTilt.x}deg)`,
+                  }}
+                >
+                  <p className="text-3xl font-bold leading-tight tracking-tight max-sm:text-2xl" style={{ textShadow: "0 0 8px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.3)" }}>$19</p>
+                  <p className="mt-0.5 text-[8px] font-medium uppercase tracking-wider opacity-90 max-sm:text-[7px]" style={{ textShadow: "0 0 4px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.25)" }}>One-time</p>
+                </div>
               </div>
               <div className="flex min-w-0 items-center self-stretch border-l-2 border-foreground/50 pl-4 max-sm:min-h-0 max-sm:pl-2 sm:min-h-[2.75rem]">
                 <p className="text-base text-foreground/80 max-sm:text-xs">Stands between you and your next interview.</p>
@@ -175,9 +213,14 @@ export function Hero() {
                   </div>
                 </div>
                 <div className="space-y-1.5 text-left">
-                  <label htmlFor="hero-email" className="block text-sm font-medium text-foreground text-left pl-3 md:pl-4">
-                    Email
-                  </label>
+                  <div className="flex items-start justify-between gap-2 pl-3 pr-0 md:pl-4">
+                    <label htmlFor="hero-email" className="text-sm font-medium text-foreground shrink-0">
+                      Email
+                    </label>
+                    <span className="mt-1.5 whitespace-nowrap text-[10px] text-gray-500 text-right">
+                      A copy of your results will be sent to this email. Make sure it&apos;s correct.
+                    </span>
+                  </div>
                   <input
                     id="hero-email"
                     type="email"

@@ -6,6 +6,12 @@ import { getResumeRecord } from "@/lib/airtable";
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+  // Prevent test key in production (Vercel) so checkout doesn't show "Test mode"
+  if (process.env.VERCEL && key.startsWith("sk_test_")) {
+    throw new Error(
+      "Stripe test key in production. In Vercel → Settings → Environment Variables, set STRIPE_SECRET_KEY to your live key (sk_live_...) for Production and redeploy."
+    );
+  }
   return new Stripe(key);
 }
 
