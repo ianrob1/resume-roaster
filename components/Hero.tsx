@@ -203,10 +203,10 @@ export function Hero() {
             </div>
 
             {(fileUrl && !roastSubmitted) || formExiting ? (
-              <div className={`mt-4 space-y-4 w-full max-w-xl md:max-w-none mx-auto md:mx-0 text-left ${formExiting ? "upload-form-exit pointer-events-none" : "upload-form-enter"}`}>
+              <div className={`mt-4 space-y-4 w-full max-w-xl md:max-w-none mx-auto md:mx-0 max-sm:px-4 text-left ${formExiting ? "upload-form-exit pointer-events-none" : "upload-form-enter"}`}>
                 <div className="grid gap-4 sm:grid-cols-2 text-left">
                   <div className="space-y-1.5 text-left">
-                    <label htmlFor="hero-job-role" className="block text-sm font-medium text-foreground text-left pl-3 md:pl-4">
+                    <label htmlFor="hero-job-role" className="block text-sm font-medium text-foreground text-left max-sm:pl-0 md:pl-4">
                       Target role
                     </label>
                     <FormSelect
@@ -219,7 +219,7 @@ export function Hero() {
                     />
                   </div>
                   <div className="space-y-1.5 text-left">
-                    <label htmlFor="hero-experience" className="block text-sm font-medium text-foreground text-left pl-3 md:pl-4">
+                    <label htmlFor="hero-experience" className="block text-sm font-medium text-foreground text-left max-sm:pl-0 md:pl-4">
                       Experience level
                     </label>
                     <FormSelect
@@ -233,11 +233,11 @@ export function Hero() {
                   </div>
                 </div>
                 <div className="space-y-1.5 text-left">
-                  <div className="flex items-start justify-between gap-2 pl-3 pr-0 md:pl-4">
+                  <div className="flex flex-col gap-0.5 max-sm:pl-0 max-sm:pr-0 md:pl-4 md:pr-0 md:flex-row md:items-start md:justify-between md:gap-2">
                     <label htmlFor="hero-job-description" className="text-sm font-medium text-foreground shrink-0">
                       Job description
                     </label>
-                    <span className="mt-1.5 whitespace-nowrap text-[10px] text-gray-500 text-right">
+                    <span className="text-[10px] text-gray-500 max-sm:order-2 max-sm:whitespace-normal md:mt-1.5 md:whitespace-nowrap md:text-right">
                       Don&apos;t have a job description? No worries — just leave it blank.
                     </span>
                   </div>
@@ -254,11 +254,11 @@ export function Hero() {
                   />
                 </div>
                 <div className="space-y-1.5 text-left">
-                  <div className="flex items-start justify-between gap-2 pl-3 pr-0 md:pl-4">
+                  <div className="flex flex-col gap-0.5 max-sm:pl-0 max-sm:pr-0 md:pl-4 md:pr-0 md:flex-row md:items-start md:justify-between md:gap-2">
                     <label htmlFor="hero-email" className="text-sm font-medium text-foreground shrink-0">
                       Email
                     </label>
-                    <span className="mt-1.5 whitespace-nowrap text-[10px] text-gray-500 text-right">
+                    <span className="text-[10px] text-gray-500 max-sm:order-2 max-sm:whitespace-normal md:mt-1.5 md:whitespace-nowrap md:text-right">
                       A copy of your results will be sent to this email. Make sure it&apos;s correct.
                     </span>
                   </div>

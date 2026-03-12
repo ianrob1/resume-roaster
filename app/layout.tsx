@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: "Resume Roaster",
   description: "Brutal feedback. Better resume. More interviews.",
+  keywords: ["resume feedback", "resume roast", "ATS score", "resume checker", "resume improvement", "job application", "resume review"],
   icons: {
     icon: [{ url: "/favicon.png?v=2", type: "image/png", sizes: "32x32" }],
     apple: "/favicon.png?v=2",
