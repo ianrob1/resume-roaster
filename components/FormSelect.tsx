@@ -46,7 +46,7 @@ export function FormSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
-        className={`${triggerBaseClass} ${value ? "border-[#e87b35]" : "border-foreground/15 hover:border-foreground/25 focus:border-[#e87b35]"}`}
+        className={`${triggerBaseClass} border-foreground/15 hover:border-foreground/25 ${open ? "border-[#e87b35] ring-2 ring-[#e87b35]/25" : ""}`}
         onClick={() => setOpen((o) => !o)}
       >
         <span className={isPlaceholder ? "text-foreground/40" : ""}>{display}</span>

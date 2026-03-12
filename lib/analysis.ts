@@ -21,7 +21,8 @@ export async function runAnalysis(recordId: string): Promise<ResumeAnalysisResul
     result = await analyzeResume(
       record.raw_text,
       record.job_role,
-      record.experience_level
+      record.experience_level,
+      record.job_description
     );
   } catch (err) {
     await updateResumeRecord(recordId, { status: "uploaded" });

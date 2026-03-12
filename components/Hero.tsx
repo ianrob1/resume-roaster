@@ -23,8 +23,10 @@ export function Hero() {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [jobRole, setJobRole] = useState<string>("");
   const [experienceLevel, setExperienceLevel] = useState<string>("");
+  const [jobDescription, setJobDescription] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [roastLoading, setRoastLoading] = useState(false);
   const [roastError, setRoastError] = useState<string | null>(null);
@@ -133,29 +135,45 @@ export function Hero() {
                     className="!m-0 !flex !h-full !min-h-full !w-full !flex-row !items-center !justify-center !rounded-xl !border-0 !bg-transparent !px-4 !py-0 !shadow-none !transition-colors"
                     appearance={{
                       container: ({ isDragActive }) =>
-                        `!m-0 !flex !h-full !min-h-full !w-full !flex-row !items-center !justify-center !rounded-xl !border-0 !bg-transparent !px-4 !py-0 !shadow-none !transition-colors ${isDragActive ? "!border-[#e87b35] !bg-[#e87b35]/5" : ""}`,
+                        `!m-0 !flex !h-full !min-h-full !w-full !flex-row !items-center !justify-center !rounded-xl !border-0 !bg-transparent !px-4 !py-0 !shadow-none !transition-colors ${uploadError ? "!border-red-400 !bg-red-50/80" : ""} ${isDragActive && !uploadError ? "!border-[#e87b35] !bg-[#e87b35]/5" : ""}`,
                       uploadIcon: "!hidden",
-                      label: "!m-0 !w-auto !text-sm !text-gray-500",
+                      label: "!m-0 !w-auto !text-sm",
                     }}
                     content={{
                       label: ({ isUploading }) =>
-                        isUploading ? (
+                        uploadError ? (
+                          <span className="text-red-600 font-medium">
+                            {uploadError}
+                          </span>
+                        ) : isUploading ? (
                           <span className="flex items-center gap-2 text-sm text-foreground/70">
                             <span className="size-4 animate-spin rounded-full border-2 border-foreground/25 border-t-[#e87b35]" aria-hidden />
                             Uploading…
                           </span>
                         ) : (
-                          "Drag or click to upload your resume"
+                          <span className="text-gray-500">Drag or click to upload your resume</span>
                         ),
                       allowedContent: () => null,
                     }}
+                    onDrop={() => setUploadError(null)}
                     onClientUploadComplete={(res) => {
+                      setUploadError(null);
                       if (res?.[0]?.url) {
                         setFileUrl(res[0].url);
                         setFileName(res[0].name ?? null);
                       }
                     }}
-                    onUploadError={(err) => setError(err.message)}
+                    onUploadError={(err) => {
+                      const msg = err.message ?? "";
+                      const isFileType =
+                        /file type|invalid type|not allowed|unsupported|\.pdf|\.doc/i.test(msg) ||
+                        msg.toLowerCase().includes("type");
+                      setUploadError(
+                        isFileType
+                          ? "Please upload a PDF or Word document (.pdf, .doc or .docx)."
+                          : msg || "Upload failed. Please try again."
+                      );
+                    }}
                   />
                 ) : (
                   <div className="flex items-center w-full px-4 h-12 bg-white">
@@ -164,9 +182,11 @@ export function Hero() {
                       type="button"
                       onClick={() => {
                         setFormExiting(true);
+                        setUploadError(null);
                         setTimeout(() => {
                           setFileUrl(null);
                           setFileName(null);
+                          setJobDescription("");
                           setEmail("");
                           setRoastSubmitted(false);
                           setRoastError(null);
@@ -214,6 +234,27 @@ export function Hero() {
                 </div>
                 <div className="space-y-1.5 text-left">
                   <div className="flex items-start justify-between gap-2 pl-3 pr-0 md:pl-4">
+                    <label htmlFor="hero-job-description" className="text-sm font-medium text-foreground shrink-0">
+                      Job description
+                    </label>
+                    <span className="mt-1.5 whitespace-nowrap text-[10px] text-gray-500 text-right">
+                      Don&apos;t have a job description? No worries — just leave it blank.
+                    </span>
+                  </div>
+                  <textarea
+                    id="hero-job-description"
+                    value={jobDescription}
+                    onChange={(e) => {
+                      setJobDescription(e.target.value);
+                      if (roastError) setRoastError(null);
+                    }}
+                    placeholder="Paste the job description here to tailor feedback and keywords to this role…"
+                    rows={4}
+                    className="w-full max-w-xl md:max-w-none mx-auto md:mx-0 rounded-box border-2 border-foreground/15 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 focus:outline-none focus:border-[#e87b35] focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10 resize-y min-h-[4.5rem] hover:border-foreground/25"
+                  />
+                </div>
+                <div className="space-y-1.5 text-left">
+                  <div className="flex items-start justify-between gap-2 pl-3 pr-0 md:pl-4">
                     <label htmlFor="hero-email" className="text-sm font-medium text-foreground shrink-0">
                       Email
                     </label>
@@ -230,7 +271,7 @@ export function Hero() {
                       if (roastError) setRoastError(null);
                     }}
                     placeholder="you@example.com"
-                    className={`h-12 w-full rounded-box border-2 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10 ${email.trim() ? "border-[#e87b35]" : "border-foreground/15 hover:border-foreground/25 focus:border-[#e87b35]"}`}
+                    className="h-12 w-full rounded-box border-2 border-foreground/15 bg-white px-4 py-3 text-sm text-foreground shadow-sm transition placeholder:text-foreground/40 focus:outline-none focus:border-[#e87b35] focus:ring-2 focus:ring-[#e87b35]/25 focus:shadow-md focus:shadow-[#e87b35]/10 hover:border-foreground/25"
                   />
                 </div>
                 <button
@@ -248,6 +289,7 @@ export function Hero() {
                           resume_file: fileUrl,
                           experience_level: experienceLevel,
                           job_role: jobRole || undefined,
+                          job_description: jobDescription.trim() || undefined,
                           email: email.trim(),
                         }),
                       });

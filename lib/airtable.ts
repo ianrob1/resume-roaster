@@ -25,6 +25,7 @@ export interface ResumeRecord {
   email: string;
   resume_file: string;
   job_role: string;
+  job_description?: string;
   experience_level: string;
   raw_text: string;
   ats_score?: number;
@@ -46,6 +47,7 @@ interface AirtableFields {
   email?: string;
   resume_file?: string;
   job_role?: string;
+  job_description?: string;
   experience_level?: string;
   raw_text?: string;
   ats_score?: number;
@@ -87,6 +89,7 @@ function mapFromAirtable(record: AirtableRecord<AirtableFields>): ResumeRecord {
     email: f.email ?? "",
     resume_file: f.resume_file ?? "",
     job_role: (f.job_role as string) ?? "Other",
+    job_description: (f.job_description as string) ?? "",
     experience_level: (f.experience_level as string) ?? "Mid",
     raw_text: f.raw_text ?? "",
     ats_score: f.ats_score,
@@ -103,17 +106,20 @@ export async function createResumeRecord(fields: {
   email: string;
   resume_file: string;
   job_role: string;
+  job_description?: string;
   experience_level: string;
   raw_text: string;
 }): Promise<ResumeRecord> {
+  const { job_description, ...rest } = fields;
+  const bodyFields: Record<string, unknown> = { ...rest, status: "uploaded" };
+  if (job_description != null && job_description !== "") {
+    bodyFields.job_description = job_description;
+  }
   const res = await fetch(BASE_URL, {
     method: "POST",
     headers: headers(),
     body: JSON.stringify({
-      fields: {
-        ...fields,
-        status: "uploaded",
-      },
+      fields: bodyFields,
     }),
   });
   if (!res.ok) {

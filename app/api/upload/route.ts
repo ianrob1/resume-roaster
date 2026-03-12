@@ -9,6 +9,7 @@ const uploadSchema = z.object({
   resume_file: z.string().url(),
   experience_level: z.string().min(1, "Experience level is required"),
   job_role: z.string().optional(),
+  job_description: z.string().optional(),
   email: z.string().refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), { message: "Invalid email" }).optional(),
 });
 
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const { resume_file, experience_level, job_role, email } = parsed.data;
+    const { resume_file, experience_level, job_role, job_description, email } = parsed.data;
 
     let raw_text: string;
     try {
@@ -59,6 +60,7 @@ export async function POST(request: Request) {
         email: email?.trim() ?? "",
         resume_file,
         job_role: job_role?.trim() || "Other",
+        job_description: job_description?.trim() ?? "",
         experience_level: experience_level.trim(),
         raw_text,
       });

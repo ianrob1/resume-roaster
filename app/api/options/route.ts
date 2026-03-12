@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+// Always fetch fresh options from Airtable (job roles / experience levels)
+export const dynamic = "force-dynamic";
+
 const DEFAULT_JOB_ROLES = [
   "Finance",
   "Marketing",
@@ -28,11 +31,12 @@ export async function GET() {
   const apiKey = process.env.AIRTABLE_API_KEY;
   const tableName = process.env.AIRTABLE_TABLE_NAME || "resumes";
 
+  const noStore = { headers: { "Cache-Control": "private, no-store, max-age=0" as const } };
   if (!baseId || !apiKey) {
-    return NextResponse.json({
-      job_roles: DEFAULT_JOB_ROLES,
-      experience_levels: DEFAULT_EXPERIENCE_LEVELS,
-    });
+    return NextResponse.json(
+      { job_roles: DEFAULT_JOB_ROLES, experience_levels: DEFAULT_EXPERIENCE_LEVELS },
+      noStore
+    );
   }
 
   try {
@@ -45,10 +49,10 @@ export async function GET() {
     if (!res.ok) {
       const err = await res.text();
       console.warn("Airtable meta fetch failed:", res.status, err);
-      return NextResponse.json({
-        job_roles: DEFAULT_JOB_ROLES,
-        experience_levels: DEFAULT_EXPERIENCE_LEVELS,
-      });
+      return NextResponse.json(
+        { job_roles: DEFAULT_JOB_ROLES, experience_levels: DEFAULT_EXPERIENCE_LEVELS },
+        noStore
+      );
     }
     const data = (await res.json()) as {
       tables?: Array<{
@@ -83,15 +87,22 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({
-      job_roles: [...job_roles].sort((a, b) => a.localeCompare(b)),
-      experience_levels,
-    });
+    return NextResponse.json(
+      {
+        job_roles: [...job_roles].sort((a, b) => a.localeCompare(b)),
+        experience_levels,
+      },
+      {
+        headers: {
+          "Cache-Control": "private, no-store, max-age=0",
+        },
+      }
+    );
   } catch (err) {
     console.warn("Options fetch error:", err);
-    return NextResponse.json({
-      job_roles: DEFAULT_JOB_ROLES,
-      experience_levels: DEFAULT_EXPERIENCE_LEVELS,
-    });
+    return NextResponse.json(
+      { job_roles: DEFAULT_JOB_ROLES, experience_levels: DEFAULT_EXPERIENCE_LEVELS },
+      noStore
+    );
   }
 }

@@ -15,9 +15,10 @@ function getGemini() {
 export async function analyzeWithGemini(
   resumeText: string,
   jobRole: string,
-  experienceLevel?: string
+  experienceLevel?: string,
+  jobDescription?: string
 ): Promise<ResumeAnalysisResult> {
-  const userContent = buildUserContent(resumeText, jobRole, experienceLevel);
+  const userContent = buildUserContent(resumeText, jobRole, experienceLevel, jobDescription);
   const ai = getGemini();
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",

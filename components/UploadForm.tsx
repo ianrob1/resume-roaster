@@ -19,8 +19,10 @@ export function UploadForm() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [jobRole, setJobRole] = useState<string>("");
   const [experienceLevel, setExperienceLevel] = useState<string>("");
+  const [jobDescription, setJobDescription] = useState<string>("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -40,6 +42,7 @@ export function UploadForm() {
           resume_file: fileUrl,
           job_role: jobRole,
           experience_level: experienceLevel,
+          job_description: jobDescription.trim() || undefined,
           email: email.trim(),
         }),
       });
@@ -84,12 +87,14 @@ export function UploadForm() {
         </label>
         {!fileUrl ? (
           <div className="space-y-2">
-            <div className="[&_.uploadthing]:!rounded-xl">
+            <div className={`[&_.uploadthing]:!rounded-xl ${uploadError ? "rounded-xl border-2 border-red-400 bg-red-50/80 [&_.uploadthing]:!border-red-400 [&_.uploadthing]:!bg-red-50/80" : ""}`}>
               <UploadDropzone
                 endpoint="resumeUploader"
                 content={{
                   label: ({ isUploading }) =>
-                    isUploading ? (
+                    uploadError ? (
+                      <span className="text-sm font-medium text-red-600">{uploadError}</span>
+                    ) : isUploading ? (
                       <span className="flex items-center gap-2 text-sm text-foreground/70">
                         <span className="size-4 shrink-0 animate-spin rounded-full border-2 border-foreground/25 border-t-[var(--accent)]" aria-hidden />
                         Uploading…
@@ -98,14 +103,26 @@ export function UploadForm() {
                       "Drag or click to upload your resume"
                     ),
                 }}
+                onDrop={() => setUploadError(null)}
                 onClientUploadComplete={(res) => {
                   setError(null);
+                  setUploadError(null);
                   if (res?.[0]?.url) {
                     setFileUrl(res[0].url);
                     setFileName(res[0].name ?? null);
                   }
                 }}
-                onUploadError={(err) => setError(err?.message ?? "Upload failed. Check that UPLOADTHING_TOKEN is set in .env.local (v7 token from UploadThing Dashboard) and restart the dev server.")}
+                onUploadError={(err) => {
+                  const msg = err?.message ?? "";
+                  const isFileType =
+                    /file type|invalid type|not allowed|unsupported|\.pdf|\.doc/i.test(msg) ||
+                    msg.toLowerCase().includes("type");
+                  setUploadError(
+                    isFileType
+                      ? "Please upload a PDF or Word document (.pdf, .doc or .docx)."
+                      : msg || "Upload failed. Please try again."
+                  );
+                }}
               />
             </div>
             <p className="text-xs text-foreground/50">PDF or Word (.doc, .docx), max 4MB</p>
@@ -120,6 +137,7 @@ export function UploadForm() {
               onClick={() => {
                 setFileUrl(null);
                 setFileName(null);
+                setUploadError(null);
               }}
               className="ml-3 shrink-0 text-sm font-medium text-[var(--accent)] hover:underline"
             >
@@ -169,6 +187,25 @@ export function UploadForm() {
           </select>
         </div>
       </div>
+
+      <section className="space-y-2">
+        <div className="flex items-start justify-between gap-2">
+          <label htmlFor="job_description" className="text-sm font-semibold text-foreground shrink-0">
+            Job description
+          </label>
+          <p className="text-[10px] text-foreground/50 text-right whitespace-nowrap">
+            Don&apos;t have a job description? No worries — just leave it blank.
+          </p>
+        </div>
+        <textarea
+          id="job_description"
+          value={jobDescription}
+          onChange={(e) => setJobDescription(e.target.value)}
+          placeholder="Paste the job description here to tailor feedback and keywords to this role…"
+          rows={4}
+          className="w-full rounded-xl border border-foreground/20 bg-white px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 resize-y min-h-[4.5rem]"
+        />
+      </section>
 
       <section className="space-y-2">
         <label htmlFor="email" className="block text-sm font-semibold text-foreground">

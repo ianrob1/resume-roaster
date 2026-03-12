@@ -15,9 +15,10 @@ function getAnthropic() {
 export async function analyzeWithClaude(
   resumeText: string,
   jobRole: string,
-  experienceLevel?: string
+  experienceLevel?: string,
+  jobDescription?: string
 ): Promise<ResumeAnalysisResult> {
-  const userContent = buildUserContent(resumeText, jobRole, experienceLevel);
+  const userContent = buildUserContent(resumeText, jobRole, experienceLevel, jobDescription);
   const client = getAnthropic();
   const message = await client.messages.create({
     model: "claude-sonnet-4-20250514",

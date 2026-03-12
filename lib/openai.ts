@@ -17,9 +17,10 @@ function getOpenAI() {
 export async function analyzeWithOpenAI(
   resumeText: string,
   jobRole: string,
-  experienceLevel?: string
+  experienceLevel?: string,
+  jobDescription?: string
 ): Promise<ResumeAnalysisResult> {
-  const userContent = buildUserContent(resumeText, jobRole, experienceLevel);
+  const userContent = buildUserContent(resumeText, jobRole, experienceLevel, jobDescription);
   const openai = getOpenAI();
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",

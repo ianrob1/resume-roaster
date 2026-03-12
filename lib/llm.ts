@@ -12,9 +12,10 @@ export type { ResumeAnalysisResult };
 export async function analyzeResume(
   resumeText: string,
   jobRole: string,
-  experienceLevel?: string
+  experienceLevel?: string,
+  jobDescription?: string
 ): Promise<ResumeAnalysisResult> {
-  const args = [resumeText, jobRole, experienceLevel] as const;
+  const args = [resumeText, jobRole, experienceLevel, jobDescription] as const;
   let lastError: unknown;
 
   if (process.env.OPENAI_API_KEY) {

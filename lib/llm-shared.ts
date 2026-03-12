@@ -9,13 +9,13 @@ export interface ResumeAnalysisResult {
 }
 
 export const SYSTEM_PROMPT = `You are an expert recruiter and resume coach.
-Analyze the following resume.
+Analyze the following resume. When a job description is provided, tailor your feedback, missing keywords, and rewritten resume specifically to that role and its requirements.
 Generate:
-1. ATS compatibility score from 0-100
+1. ATS compatibility score from 0-100 (when job description is given, score against that role's requirements)
 2. A brutal but helpful roast of the resume
 3. Improved bullet points (before/after pairs for weak bullets)
-4. Missing keywords for the target role
-5. A rewritten version of the resume
+4. Missing keywords for the target role (prioritize keywords from the job description when provided)
+5. A rewritten version of the resume (aligned to the job description when provided)
 
 Return valid JSON only, no markdown or extra text, with this exact shape:
 {
@@ -29,9 +29,14 @@ Return valid JSON only, no markdown or extra text, with this exact shape:
 export function buildUserContent(
   resumeText: string,
   jobRole: string,
-  experienceLevel?: string
+  experienceLevel?: string,
+  jobDescription?: string
 ): string {
-  return `Resume Text:\n${resumeText}\n\nTarget Role: ${jobRole}${experienceLevel ? `\nExperience Level: ${experienceLevel}` : ""}`;
+  let out = `Resume Text:\n${resumeText}\n\nTarget Role: ${jobRole}${experienceLevel ? `\nExperience Level: ${experienceLevel}` : ""}`;
+  if (jobDescription?.trim()) {
+    out += `\n\nJob Description (tailor feedback, keywords, and rewrite to this role):\n${jobDescription.trim()}`;
+  }
+  return out;
 }
 
 /** Strip markdown code fences if present, then parse and validate. */
