@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3003",
     "dev:turbo": "next dev -p 3003 --turbo",
-    "build": "node scripts/generate-favicon.cjs && next build",
+    "build": "next build",
     "start": "next start -p 3003",
     "preview": "next build && next start -p 3003",
     "lint": "next lint"
