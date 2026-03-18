@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UploadDropzone } from "@/lib/uploadthing";
-import { ATSInfoButtonLight } from "@/components/ATSInfoButton";
 import { FormSelect } from "@/components/FormSelect";
 
 const DEFAULT_JOB_ROLES = [
@@ -34,27 +33,6 @@ export function Hero() {
   const [jobRoles, setJobRoles] = useState<string[]>(DEFAULT_JOB_ROLES);
   const [experienceLevels, setExperienceLevels] = useState<string[]>(DEFAULT_EXPERIENCE_LEVELS);
   const [formExiting, setFormExiting] = useState(false);
-  const [priceTilt, setPriceTilt] = useState({ x: 0, y: 0 });
-  const priceRef = useRef<HTMLDivElement>(null);
-
-  const MAX_TILT = 14;
-  const onPriceMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const el = priceRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const x = (e.clientX - centerX) / (rect.width / 2);
-      const y = (e.clientY - centerY) / (rect.height / 2);
-      setPriceTilt({
-        x: Math.max(-1, Math.min(1, x)) * -MAX_TILT,
-        y: Math.max(-1, Math.min(1, y)) * MAX_TILT,
-      });
-    },
-    []
-  );
-  const onPriceMouseLeave = useCallback(() => setPriceTilt({ x: 0, y: 0 }), []);
 
   useEffect(() => {
     fetch("/api/options")
@@ -95,32 +73,6 @@ export function Hero() {
             <p className="mt-6 text-lg text-foreground/80 max-w-lg">
               Get more interviews. Upload your resume and get an ATS score, brutal feedback, and a full rewrite in 60 seconds.
             </p>
-            <div className="mt-4 flex items-center">
-              <div
-                ref={priceRef}
-                className="mr-2 shrink-0 origin-center"
-                style={{ perspective: "600px" }}
-                onMouseMove={onPriceMouseMove}
-                onMouseLeave={onPriceMouseLeave}
-              >
-                <div
-                  className="flex scale-90 flex-col items-center justify-center rounded-md border border-foreground/25 px-4 py-2 text-white transition-transform duration-200 ease-out max-sm:scale-85 max-sm:px-3 max-sm:py-1.5"
-                  style={{
-                    background: "linear-gradient(165deg, #f08d4a 0%, #e87b35 35%, #d96d2b 100%)",
-                    boxShadow:
-                      "inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.12), 0 12px 24px rgba(0,0,0,0.08)",
-                    transformStyle: "preserve-3d",
-                    transform: `rotateX(${priceTilt.y}deg) rotateY(${priceTilt.x}deg)`,
-                  }}
-                >
-                  <p className="text-3xl font-bold leading-tight tracking-tight max-sm:text-2xl" style={{ textShadow: "0 0 8px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.3)" }}>$19</p>
-                  <p className="mt-0.5 text-[8px] font-medium uppercase tracking-wider opacity-90 max-sm:text-[7px]" style={{ textShadow: "0 0 4px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.25)" }}>One-time</p>
-                </div>
-              </div>
-              <div className="flex min-w-0 items-center self-stretch border-l-2 border-foreground/50 pl-4 max-sm:min-h-0 max-sm:pl-2 sm:min-h-[2.75rem]">
-                <p className="text-base text-foreground/80 max-sm:text-xs">Stands between you and your next interview.</p>
-              </div>
-            </div>
           </div>
 
           <div className="mt-8 space-y-5 flex flex-col items-center md:items-stretch">
@@ -296,7 +248,7 @@ export function Hero() {
                       const data = await res.json().catch(() => ({}));
                       if (!res.ok) throw new Error(data.error ?? "Something went wrong");
                       const recordId = data.recordId ?? "";
-                      if (recordId) router.push(`/checkout?record_id=${encodeURIComponent(recordId)}`);
+                      if (recordId) router.push(`/processing?record_id=${encodeURIComponent(recordId)}`);
                       else setRoastSubmitted(true);
                     } catch (err) {
                       setRoastError(err instanceof Error ? err.message : "Something went wrong");
@@ -319,31 +271,6 @@ export function Hero() {
             {fileUrl && roastSubmitted && (
               <p className="mt-4 text-sm font-medium text-foreground/80">We&apos;re roasting your resume. Check back soon.</p>
             )}
-
-            <div className="flex flex-wrap gap-8 pt-4 border-t border-foreground/10 justify-center md:justify-start">
-              <div className="flex flex-col">
-                <p className="min-h-[2rem] text-2xl font-bold leading-tight text-foreground">87.3%</p>
-                <p className="mt-0.5 flex items-center gap-1 text-sm text-foreground/70">
-                  <span>Average ATS score</span>
-                  <ATSInfoButtonLight />
-                </p>
-              </div>
-              <div className="flex flex-col">
-                <p className="min-h-[2rem] text-2xl font-bold leading-tight text-foreground">~15.2k</p>
-                <p className="mt-0.5 text-sm text-foreground/70">Resumes roasted</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <p className="flex min-h-[2rem] items-center justify-center leading-tight text-foreground" aria-hidden>
-                  <span className="text-lg font-bold">★★★★</span>
-                  <span className="relative inline-block text-lg font-bold">
-                    <span className="text-foreground/30">☆</span>
-                    <span className="absolute left-0 top-0 w-1/2 overflow-hidden text-foreground">★</span>
-                  </span>
-                </p>
-                <p className="mt-0.5 text-sm text-foreground/70">4.5 Average user rating</p>
-              </div>
-            </div>
-            <p className="mt-3 text-center text-xs text-gray-500 md:text-left">Resume Roaster users report a measurable increase in interview callbacks.</p>
           </div>
         </div>
 

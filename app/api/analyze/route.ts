@@ -24,29 +24,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Record not found" }, { status: 404 });
     }
 
-    if (session_id) {
-      let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-      if (!baseUrl) {
-        try {
-          const u = new URL(request.url);
-          baseUrl = `${u.protocol}//${u.host}`;
-        } catch {
-          baseUrl = "http://localhost:3000";
-        }
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!baseUrl) {
+      try {
+        const u = new URL(request.url);
+        baseUrl = `${u.protocol}//${u.host}`;
+      } catch {
+        baseUrl = "http://localhost:3000";
       }
-      const resultsLink = `${baseUrl}/results?session_id=${encodeURIComponent(session_id)}`;
-      await sendResumeRoastEmail({
-        to: record.email,
-        atsScore: result.ats_score,
-        resultsLink,
-        roastText: result.roast,
-        bulletImprovements: result.bullet_improvements,
-        missingKeywords: result.missing_keywords,
-        rewrittenResume: result.rewritten_resume,
-        jobRole: record.job_role,
-        candidateFirstName: getFirstNameFromResumeText(record.raw_text),
-      });
     }
+    const resultsLink = session_id
+      ? `${baseUrl}/results?session_id=${encodeURIComponent(session_id)}`
+      : `${baseUrl}/results?record_id=${encodeURIComponent(recordId)}`;
+    await sendResumeRoastEmail({
+      to: record.email,
+      atsScore: result.ats_score,
+      resultsLink,
+      roastText: result.roast,
+      bulletImprovements: result.bullet_improvements,
+      missingKeywords: result.missing_keywords,
+      rewrittenResume: result.rewritten_resume,
+      jobRole: record.job_role,
+      candidateFirstName: getFirstNameFromResumeText(record.raw_text),
+    });
   } catch (err) {
     const message =
       err instanceof Error ? err.message : typeof err === "string" ? err : "Analysis failed";

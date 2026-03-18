@@ -34,8 +34,10 @@ function ProcessingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sessionId = searchParams.get("session_id");
+  const recordIdParam = searchParams.get("record_id");
   const isPreview = sessionId === "preview";
   const isFastPreview = isPreview && searchParams.get("fast") === "1";
+  const isFreeFlow = !!recordIdParam;
   type StepPhase = "showing" | "exiting" | "entering";
   const [stepIndex, setStepIndex] = useState(0);
   const [stepPhase, setStepPhase] = useState<StepPhase>("showing");
@@ -47,27 +49,40 @@ function ProcessingContent() {
   const triggerAttemptedRef = useRef(false);
   const startedAtRef = useRef<number>(Date.now());
 
+  // Free flow: trigger analysis once on mount
   useEffect(() => {
-    if (!sessionId || isPreview) return;
+    if (!isFreeFlow || !recordIdParam || triggerAttemptedRef.current) return;
+    triggerAttemptedRef.current = true;
+    fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ recordId: recordIdParam }),
+    }).catch(() => {});
+  }, [isFreeFlow, recordIdParam]);
+
+  useEffect(() => {
+    if (isPreview) return;
+    const id = sessionId ? `session_id=${encodeURIComponent(sessionId)}` : recordIdParam ? `record_id=${encodeURIComponent(recordIdParam)}` : null;
+    if (!id) return;
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/results?session_id=${encodeURIComponent(sessionId)}`);
+        const res = await fetch(`/api/results?${id}`);
         const data = await res.json().catch(() => ({}));
         if (data.status === "completed") {
-          router.replace(`/results?session_id=${encodeURIComponent(sessionId)}`);
+          router.replace(`/results?${id}`);
           return;
         }
         if (!res.ok && data.error) {
           setErrorMsg(data.error);
           return;
         }
-        // If still not completed after a while, trigger analysis (e.g. Stripe webhook didn't run locally)
-        const elapsed = Date.now() - startedAtRef.current;
+        // Stripe flow only: if still not completed after a while, trigger analysis (e.g. webhook didn't run locally)
         if (
+          sessionId &&
           data.recordId &&
           data.status !== "completed" &&
           !triggerAttemptedRef.current &&
-          elapsed >= TRIGGER_ANALYSIS_AFTER_MS
+          Date.now() - startedAtRef.current >= TRIGGER_ANALYSIS_AFTER_MS
         ) {
           triggerAttemptedRef.current = true;
           fetch("/api/analyze", {
@@ -81,21 +96,21 @@ function ProcessingContent() {
       }
     }, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [sessionId, router, isPreview]);
+  }, [sessionId, recordIdParam, router, isPreview]);
 
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId && !recordIdParam) return;
     const delay = isFastPreview ? PREVIEW_FAST_TAKING_LONGER_MS : TAKING_LONGER_AFTER_MS;
     const t = setTimeout(() => setTakingLonger(true), delay);
     return () => clearTimeout(t);
-  }, [sessionId, isFastPreview]);
+  }, [sessionId, recordIdParam, isFastPreview]);
 
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId && !recordIdParam) return;
     const delay = isFastPreview ? PREVIEW_FAST_SUBTEXT_MS : SHOW_SUBTEXT_AFTER_MS;
     const t = setTimeout(() => setShowSubtext(true), delay);
     return () => clearTimeout(t);
-  }, [sessionId, isFastPreview]);
+  }, [sessionId, recordIdParam, isFastPreview]);
 
   useEffect(() => {
     if (!showSubtext) {
@@ -137,10 +152,10 @@ function ProcessingContent() {
     return () => clearTimeout(t);
   }, [stepPhase]);
 
-  if (!sessionId) {
+  if (!sessionId && !recordIdParam) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
-        <p className="text-foreground/80">Missing session. Please complete checkout first.</p>
+        <p className="text-foreground/80">Missing session or record. Please start from the home page.</p>
         <a href="/processing?session_id=preview" className="mt-3 text-sm text-[var(--accent)] hover:underline">
           Preview processing screen
         </a>

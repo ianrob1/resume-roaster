@@ -59,6 +59,8 @@ const PREVIEW_RESULTS: ResultsData = {
 function ResultsContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const recordIdParam = searchParams.get("record_id");
+  const resultsParam = sessionId ? `session_id=${encodeURIComponent(sessionId)}` : recordIdParam ? `record_id=${encodeURIComponent(recordIdParam)}` : null;
   const [data, setData] = useState<ResultsData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,8 @@ function ResultsContent() {
   const autoRunDoneRef = useRef(false);
 
   const runAnalysisNow = async () => {
-    if (!data?.recordId || !sessionId) return;
+    const rid = data?.recordId ?? recordIdParam;
+    if (!rid) return;
     setTriggerError(null);
     setTriggering(true);
     try {
@@ -76,7 +79,7 @@ function ResultsContent() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recordId: data.recordId, session_id: sessionId }),
+        body: JSON.stringify({ recordId: rid, ...(sessionId ? { session_id: sessionId } : {}) }),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -88,9 +91,10 @@ function ResultsContent() {
       }
       const maxWait = 90000;
       const start = Date.now();
+      const query = resultsParam ?? `record_id=${encodeURIComponent(rid)}`;
       while (Date.now() - start < maxWait) {
         await new Promise((r) => setTimeout(r, 3000));
-        const r2 = await fetch(`/api/results?session_id=${encodeURIComponent(sessionId)}`);
+        const r2 = await fetch(`/api/results?${query}`);
         const d = await r2.json();
         if (d.status === "completed") {
           setData(d);
@@ -111,8 +115,8 @@ function ResultsContent() {
   };
 
   useEffect(() => {
-    if (!sessionId) {
-      setError("Missing session.");
+    if (!resultsParam && sessionId !== "preview") {
+      setError("Missing session or record.");
       setLoading(false);
       return;
     }
@@ -121,9 +125,10 @@ function ResultsContent() {
       setLoading(false);
       return;
     }
+    if (!resultsParam) return;
     (async () => {
       try {
-        const res = await fetch(`/api/results?session_id=${encodeURIComponent(sessionId)}`);
+        const res = await fetch(`/api/results?${resultsParam}`);
         const json = await res.json();
         if (!res.ok) {
           setError(json.error ?? "Failed to load results");
@@ -137,7 +142,7 @@ function ResultsContent() {
         setLoading(false);
       }
     })();
-  }, [sessionId]);
+  }, [resultsParam, sessionId]);
 
   // Auto-start analysis when results page loads and report isn't ready yet (skip for preview)
   useEffect(() => {
@@ -146,8 +151,8 @@ function ResultsContent() {
       loading ||
       !data ||
       data.status === "completed" ||
-      !data.recordId ||
-      !sessionId ||
+      !(data.recordId || recordIdParam) ||
+      (!sessionId && !recordIdParam) ||
       triggering ||
       autoRunDoneRef.current
     )
@@ -155,7 +160,7 @@ function ResultsContent() {
     autoRunDoneRef.current = true;
     runAnalysisNow();
   // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when we have incomplete data
-  }, [loading, data?.status, data?.recordId, sessionId, triggering]);
+  }, [loading, data?.status, data?.recordId, sessionId, recordIdParam, triggering]);
 
   async function handleDownloadDocx() {
     if (!data?.rewritten_resume) return;
